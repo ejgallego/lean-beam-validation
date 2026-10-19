@@ -1,0 +1,81 @@
+# Copyright (c) 2026 Lean FRO, LLC. Released under Apache 2.0.
+name: Validate macOS artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_set:
+        description: Explicit candidate records under candidates/
+        type: choice
+        options: [c632]
+        default: c632
+      tier:
+        description: Consumer test suite
+        type: choice
+        options: [pilot, functional]
+        default: pilot
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  consume:
+    if: github.repository == 'ejgallego/lean-beam-validation' && github.event_name == 'workflow_dispatch'
+    name: ${{ matrix.platform }} / ${{ inputs.tier }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-aarch64
+            runner: macos-15
+          - platform: macos-x86_64
+            runner: macos-15-intel
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    env:
+      CANDIDATE_SET: ${{ inputs.candidate_set }}
+      PLATFORM: ${{ matrix.platform }}
+      TIER: ${{ inputs.tier }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Compile and test harness
+        run: |
+          python3 -m compileall -q ./*.py tests
+          python3 -m unittest discover -s tests -v
+      - name: Install consumer tools
+        run: brew install zstd elan
+      - name: Record harness revision
+        run: |
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/harness-revision.txt
+      - name: Read existing producer artifact
+        env:
+          GH_TOKEN: ${{ secrets.ARTIFACT_READ_TOKEN || github.token }}
+        run: |
+          python3 candidate.py fetch --candidate "candidates/$CANDIDATE_SET-$PLATFORM.json" \
+            --platform "$PLATFORM" --download downloads/candidate
+      - name: Run native consumer with measured sandbox
+        run: |
+          python3 candidate.py validate --candidate "candidates/$CANDIDATE_SET-$PLATFORM.json" \
+            --platform "$PLATFORM" --download downloads/candidate --output evidence --tier "$TIER"
+      - name: Retain download identity
+        if: always()
+        run: |
+          mkdir -p evidence
+          if [[ -f downloads/candidate/identity.json ]]; then
+            cp downloads/candidate/identity.json evidence/artifact-identity.json
+          fi
+      - name: Upload this repository's evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.platform }}-${{ inputs.tier }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 30

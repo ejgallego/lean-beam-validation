@@ -116,7 +116,7 @@ class InventoryTests(unittest.TestCase):
 
 class LoaderTests(unittest.TestCase):
     def test_executable_missing_or_external_lean_library_rejected(self):
-        prefix = Path("/tmp/sdk")
+        prefix = Path("/tmp/sdk").resolve()
         verify_executable_dependencies("libLake_shared.so => /tmp/sdk/lib/lean/libLake_shared.so (0x123)", prefix)
         for text in ["libLake_shared.so => not found", "libc.so.6 => not found",
                      "libLake_shared.so => /tmp/foreign/libLake_shared.so (0x123)"]:

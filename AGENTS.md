@@ -8,6 +8,6 @@ This repository exists to keep experimental validation activity in `ejgallego` a
 * Keep workflow permissions read-only. Source artifact access must use GET requests only. Upload results solely to this validation repository.
 * Never rebuild Beam to test an archive. Invoke the extracted SDK directly, with no producer-path or standalone-runtime fallback.
 * Do not rename, modify, or remove existing developer build directories. Disposable consumer fixtures may be cleaned up by their owner.
-* Add meaningful regression tests before implementing harness features. Run `python3 -m compileall -q fetch.py run_linux.py validate.py functional.py mcp_client.py tests`, `python3 -m unittest discover -s tests -v`, and actionlint after relevant edits.
+* Add meaningful regression tests before implementing harness features. Run `python3 -m compileall -q ./*.py tests`, `python3 -m unittest discover -s tests -v`, and actionlint after relevant edits.
 * Report current implemented coverage separately from the plan. A pilot pass is not release qualification. Missing required evidence is blocked, never a pass.
 * Tokens must not reach runtime tests or evidence. Record artifact IDs, inner digests, revisions, and harness revision for every hosted pilot.

@@ -1,0 +1,14 @@
+{
+  "copyright": "Copyright (c) 2026 Lean FRO, LLC. Apache-2.0.",
+  "producer_repository": "leanprover/lean4",
+  "producer_run": 39253075497,
+  "lean_sha": "c632e66d90a83f33568e4a8705b8ad57c5d82c2b",
+  "beam_sha": "b184cb0b906b0b7ac92054d79475dfebcf90920e",
+  "inner_archive_sha256": null,
+  "producer_manifest_sha256": null,
+  "qualification_status": "BLOCKED",
+  "note": "Experimental candidate; independent producer attestation and full release qualification remain pending.",
+  "platform": "macos-aarch64",
+  "artifact_id": 12187632501,
+  "wrapper_sha256": "cc7f9e3397f09ad64e72a43a0b05ce09b757886bd522526b4b744be849b61ea5"
+}

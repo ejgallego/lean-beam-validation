@@ -29,14 +29,24 @@ The **functional** suite adds:
 * P12/P13: missing and corrupted inventory members; missing daemon/plugin/shared libraries; live generation replacement; cleanup with malformed provenance. All mutations use a separate SDK copy without shared file inodes.
 * P14/P15: five graceful cycles, forced owner loss, refusal of wrong-generation recovery, exact-generation recovery retaining evidence, safe restart, helper cancellation/EOF/client loss/deadline/abrupt exit, and descendant termination. Helper fixtures block on explicit release markers under external watchdogs.
 
-Full release qualification remains blocked on independent producer attestation in P01, the native platform/format matrix in P16, and final publication digest reconciliation in P17. The current Linux implementation does not establish Windows job ownership, macOS loader compatibility, format parity, or the minimum supported OS baseline. Those remain separate qualification work.
+Full release qualification remains blocked on independent producer attestation in P01, the native platform/format matrix in P16, and final publication digest reconciliation in P17. A pass on one native platform does not establish another platform's process ownership, loader compatibility, format parity, or the minimum supported OS baseline.
+
+## macOS consumers
+
+The separate **Validate macOS artifacts** workflow consumes explicit candidate records on native `macos-15` ARM and `macos-15-intel` runners. It supports `pilot` and `functional` tiers and remains manual only. Its initial candidate set is `c632`, with separate artifact IDs and wrapper digests per architecture.
+
+`run_macos.py` extracts a complete SDK with spaces and Unicode in its path, prepares an isolated profile, and executes the consumer under Seatbelt. A preflight probe must demonstrate loopback TCP, denial of external TCP and wildcard binds, denial of SDK writes, and allowed fixture writes. External denial must be a permission error, not a timeout or an unavailable remote host. There is no unsandboxed fallback.
+
+`macos.py` checks native architecture with `lipo`, declared dependencies/load commands with `otool`, and live plugin/library paths with `vmmap`. The functional tier reuses the Linux scenarios with macOS process observations and `.dylib` dependencies. Canonical paths account for `/var` versus `/private/var`; functional selectors also exercise a second alias of the SDK. macOS results remain pending until the native hosted runs complete.
+
+The network profile follows the loopback address syntax used by [Codex's Seatbelt implementation](https://github.com/openai/codex/blob/main/codex-rs/sandboxing/src/seatbelt.rs); [SwiftPM's sandbox implementation](https://github.com/swiftlang/swift-package-manager/blob/main/Sources/Basics/Sandbox.swift) also documents independent network and read-only directory rules. Actual probe results are retained with each consumer run.
 
 ## Run locally
 
 Linux requires Python 3.12+, `zstd`, working unprivileged `bubblewrap`, and `elan` for functional selector setup. GitHub artifact download also requires `gh` and credentials with permission to read the selected artifact. No Lean/Beam source build is needed.
 
 ```sh
-python3 -m compileall -q fetch.py run_linux.py validate.py functional.py mcp_client.py tests
+python3 -m compileall -q ./*.py tests
 python3 -m unittest discover -s tests -v
 
 python3 fetch.py --repository leanprover/lean4 \
@@ -72,4 +82,4 @@ The initial hosted Linux pilot passed in [run 39271577415](https://github.com/ej
 
 The hosted functional suite also passed in [run 39274451011](https://github.com/ejgallego/lean-beam-validation/actions/runs/39274451011): 18 harness tests, 16 functional check groups, and ten helper lifecycle scenarios. The [candidate report](reports/c632-linux-x86_64.json) preserves the tested harness revision, archive digest, observed generation, per-file sizes, and individual outcomes. The consumer-observed provenance digest remains separate from the missing independent producer attestation.
 
-Next: implement native macOS/Windows/ARM consumers and reconcile producer/publication evidence. Windows currently lacks an archive from this producer run because its native helper build fails; a released-SDK result would not qualify that stage build. Keep each result attached to its archive digest and harness revision; qualify a new archive after any binary change. Upstream changes and upstream CI remain under the user's separate approval policy.
+Next: establish native macOS results, implement Windows/Linux ARM consumers, and reconcile producer/publication evidence. Windows currently lacks an archive from this producer run because its native helper build fails; a released-SDK result would not qualify that stage build. Keep each result attached to its archive digest and harness revision; qualify a new archive after any binary change. Upstream changes and upstream CI remain under the user's separate approval policy.

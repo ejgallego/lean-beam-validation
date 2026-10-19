@@ -14,6 +14,7 @@ import time
 import traceback
 
 from mcp_client import McpClient
+from processes import process_tree, running
 from validate import Pilot, ValidationError, require, sha256, verify_inventory, write_json
 
 
@@ -73,29 +74,6 @@ def writable_sdk_copy(prefix, destination):
     return destination
 
 
-def process_tree(parent):
-    parents = {}
-    for proc in Path("/proc").iterdir():
-        if proc.name.isdigit():
-            try:
-                parents[int(proc.name)] = int((proc / "stat").read_text().rsplit(")", 1)[1].split()[1])
-            except (FileNotFoundError, ProcessLookupError):
-                pass
-    children = {parent}
-    while True:
-        expanded = children | {pid for pid, ppid in parents.items() if ppid in children}
-        if expanded == children:
-            return children
-        children = expanded
-
-
-def running(pid):
-    try:
-        return Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[0] != "Z"
-    except FileNotFoundError:
-        return False
-
-
 def wait_until(predicate, message, timeout=30):
     deadline = time.monotonic() + timeout
     while not predicate():
@@ -128,6 +106,8 @@ class NotApplicable(Exception):
 
 
 class FunctionalSuite(Pilot):
+    suite_name = "linux-functional"
+
     def capture(self, argv, *, cwd=None, env=None, timeout=120):
         self.counter += 1
         stem = self.output / f"command-{self.counter:03}"
@@ -408,7 +388,8 @@ class FunctionalSuite(Pilot):
                 require(path.name in result.stderr and "missing" in result.stderr, "wrong missing runtime failure")
             finally:
                 parked.rename(path)
-        for name in ["libleanshared.so", "libLake_shared.so"]:
+        extension = ".dylib" if sys.platform == "darwin" else ".so"
+        for name in [f"libleanshared{extension}", f"libLake_shared{extension}"]:
             path = prefix / "lib/lean" / name
             parked = path.with_name(path.name + ".parked")
             path.rename(parked)
@@ -532,7 +513,7 @@ class FunctionalSuite(Pilot):
                     write_json(self.output / "helper-lifecycles.json", outcomes)
 
     def execute(self):
-        checks = [("inventory", self.inventory), ("identity", self.identity), ("ELF dependencies", self.loaders),
+        checks = [("inventory", self.inventory), ("identity", self.identity), (self.loader_case, self.loaders),
                   ("CLI and live plugin", self.cli), ("MCP self-check", self.mcp_self_check)]
         checks += [("P04/P05 CLI edits and recovery", self.cli_edit_and_recovery),
                    ("P06 save and replay", self.save_and_replay), ("P07 deferred save", self.deferred_save),
@@ -553,7 +534,7 @@ class FunctionalSuite(Pilot):
                     break
         write_json(self.output / "results.json", self.results)
         write_json(self.output / "summary.json", {
-            "suite": "linux-functional", "status": "FAIL" if failed else "PASS", "release_qualified": False,
+            "suite": self.suite_name, "status": "FAIL" if failed else "PASS", "release_qualified": False,
             "qualification_status": "BLOCKED", "lean_sha": self.args.lean_sha, "beam_sha": self.args.beam_sha,
             "pending": ["P01 independent producer attestation",
                         "P16 other platforms/formats", "P17 publication reconciliation"], "results": self.results,

@@ -11,6 +11,7 @@ from pathlib import Path, PurePosixPath
 import re
 import signal
 import subprocess
+import sys
 import time
 import traceback
 
@@ -93,6 +94,9 @@ def verify_executable_dependencies(text, prefix):
 
 
 class Pilot:
+    suite_name = "initial-linux-pilot"
+    loader_case = "ELF dependencies"
+
     def __init__(self, args):
         self.args = args
         self.prefix = args.prefix.resolve()
@@ -112,6 +116,7 @@ class Pilot:
         return stem.with_suffix(".stdout").read_text()
 
     def case(self, name, action):
+        print(f"Starting: {name}", flush=True)
         start = time.monotonic()
         result = {"case": name, "status": "PASS", "started_at": datetime.now(timezone.utc).isoformat(),
                   "identity_file": "input.json"}
@@ -124,6 +129,7 @@ class Pilot:
             result["duration_seconds"] = time.monotonic() - start
             self.results.append(result)
             write_json(self.output / "results.json", self.results)
+            print(f"Finished: {name} ({result['duration_seconds']:.2f}s)", flush=True)
 
     def inventory(self):
         for path in self.args.forbidden_path:
@@ -247,13 +253,13 @@ class Pilot:
         passed = False
         try:
             for name, action in [("inventory", self.inventory), ("identity", self.identity),
-                                 ("ELF dependencies", self.loaders), ("CLI and live plugin", self.cli),
+                                 (self.loader_case, self.loaders), ("CLI and live plugin", self.cli),
                                  ("MCP self-check", self.mcp_self_check), ("unchanged payload", self.unchanged)]:
                 self.case(name, action)
             passed = True
         finally:
             write_json(self.output / "summary.json", {
-                "suite": "initial-linux-pilot", "status": "PASS" if passed else "FAIL",
+                "suite": self.suite_name, "status": "PASS" if passed else "FAIL",
                 "release_qualified": False,
                 "qualification_note": "P01-P17 remain pending full implementation; these are pilot checks only.",
                 "lean_sha": self.args.lean_sha, "beam_sha": self.args.beam_sha,
@@ -272,8 +278,12 @@ def main():
     parser.add_argument("--forbidden-path", action="append", type=Path, default=[])
     parser.add_argument("--tier", choices=["pilot", "functional"], default="pilot")
     parser.add_argument("--foreign-prefix", type=Path)
+    parser.add_argument("--expected-architecture", choices=["arm64", "x86_64"])
     args = parser.parse_args()
-    if args.tier == "functional":
+    if sys.platform == "darwin":
+        from macos import MacFunctional, MacPilot
+        (MacFunctional if args.tier == "functional" else MacPilot)(args).execute()
+    elif args.tier == "functional":
         from functional import FunctionalSuite
         FunctionalSuite(args).execute()
     else:

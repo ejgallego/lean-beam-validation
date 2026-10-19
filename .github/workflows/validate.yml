@@ -48,7 +48,7 @@ jobs:
           persist-credentials: false
       - name: Compile and test harness
         run: |
-          python3 -m compileall -q fetch.py run_linux.py validate.py functional.py mcp_client.py tests
+          python3 -m compileall -q ./*.py tests
           python3 -m unittest discover -s tests -v
 
   linux-pilot:
