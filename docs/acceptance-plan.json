@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "updated_at_utc": "2026-10-19T15:09:35.231891+00:00",
-  "status": "Linux pilot and functional suites implemented; independent producer evidence, native platform matrix, and publication reconciliation remain pending.",
+  "updated_at_utc": "2026-10-19T16:54:52.516266+00:00",
+  "status": "Linux x86_64 and both macOS architectures pass hosted functional suites; independent producer evidence, Windows/Linux ARM, minimum OS baselines and publication reconciliation remain pending.",
   "candidate": {
     "lean_sha": "c632e66d90a83f33568e4a8705b8ad57c5d82c2b",
     "beam_sha": "b184cb0b906b0b7ac92054d79475dfebcf90920e",
@@ -15,7 +15,8 @@
     "lean_ci": "Staged package smoke/inventory/identity/selector checks; its relocation fixture links standard libraries back to the build SDK. Packaging/upload precedes those tests.",
     "local_linux": "Exact CI-produced Linux archive consumed locally with producer worktree hidden, clean environment, read-only SDK and networking disabled.",
     "beam_native_tests": "Provide save/replay, MCP generation/reuse and installed helper scenarios to adapt; the build-oriented native script is not an artifact-only harness as-is.",
-    "artifact_gate": "Hosted Linux pilot and functional suites pass in ejgallego/lean-beam-validation runs 39271577415 and 39274451011. Full release qualification remains blocked on producer attestation, other native platforms/formats and publication reconciliation."
+    "artifact_gate": "Hosted Linux x86_64 and native macOS ARM/Intel functional suites pass in ejgallego/lean-beam-validation. Producer attestation, Windows/Linux ARM, baseline/format qualification and publication reconciliation remain pending.",
+    "native_macos": "Both native architectures pass 30 harness tests, 16 functional groups and ten helper lifecycle scenarios in https://github.com/ejgallego/lean-beam-validation/actions/runs/39287560390; full release qualification remains blocked."
   },
   "execution_environment": {
     "consumer": "Fresh native runner per architecture, validation harness at a path different from original producer checkout; original source/build/install locations asserted absent.",
@@ -30,7 +31,7 @@
     "isolation": [
       "separate test user/profile and isolated ELAN_HOME",
       "clear Lean/Lake/Beam and dynamic-loader overrides for baseline",
-      "network disabled during behavior checks; collect attempted provisioning evidence",
+      "External network access denied during behavior checks; record macOS host-local TCP allowance and observed loopback Beam listeners, and collect attempted provisioning evidence.",
       "start without dependency caches; only a test-project .lake may be produced by the extracted SDK",
       "space for archive, two independent SDK roots, disposable mutation copies and test-project outputs",
       "do not rename or hide active developer build directories; use fresh runners or owned namespaces"
@@ -65,16 +66,18 @@
       "artifact_name": "build-macOS",
       "formats": "tar.zst",
       "current_build_snapshot": "success",
-      "artifact_acceptance": "not yet run on hosted CI archive",
-      "blocking_note": ""
+      "artifact_acceptance": "hosted 16-group functional suite passed on native macOS 15; full release qualification remains blocked",
+      "blocking_note": "",
+      "validation_run": "https://github.com/ejgallego/lean-beam-validation/actions/runs/39287560390"
     },
     {
       "platform": "macos-aarch64",
       "artifact_name": "build-macOS aarch64",
       "formats": "tar.zst",
       "current_build_snapshot": "success",
-      "artifact_acceptance": "not yet run on hosted CI archive",
-      "blocking_note": ""
+      "artifact_acceptance": "hosted 16-group functional suite passed on native macOS 15; full release qualification remains blocked",
+      "blocking_note": "",
+      "validation_run": "https://github.com/ejgallego/lean-beam-validation/actions/runs/39287560390"
     },
     {
       "platform": "windows-x86_64",

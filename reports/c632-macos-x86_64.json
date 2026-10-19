@@ -1,0 +1,192 @@
+{
+  "copyright": "Copyright (c) 2026 Lean FRO, LLC. Apache-2.0.",
+  "validation_run": "https://github.com/ejgallego/lean-beam-validation/actions/runs/39287560390",
+  "evidence_artifact_id": 12204263020,
+  "evidence_artifact_sha256": "75a9051a286cb4a110a694aae2d597f8d6b2aec51478b714247062d4d52f590b",
+  "harness_revision": "d894fe9092c241beff3485772c636c1a4d777fb4",
+  "harness_worktree_dirty": false,
+  "producer_repository": "leanprover/lean4",
+  "producer_run": 39253075497,
+  "producer_artifact_id": 12197122553,
+  "wrapper_sha256": "0f61c84eea15f4cb7ee8a24547bc797b149e6fe77436e675e5f590b4f8770264",
+  "archive_filename": "lean-4.37.0-pre-darwin.tar.zst",
+  "archive_sha256": "dc042b8210038aa29beb1da4bb173432d8caafb1e285be6ec6705bbf81fd34a5",
+  "archive_bytes": 837579354,
+  "platform": "macos-x86_64",
+  "consumer_platform": {
+    "system": "Darwin",
+    "release": "24.6.0",
+    "version": "Darwin Kernel Version 24.6.0: Tue Jul 21 20:50:07 PDT 2026; root:xnu-11417.140.69.711.44~1/RELEASE_X86_64",
+    "machine": "x86_64"
+  },
+  "observed_build_id": "272044d859810d6309d0a2324e4ff5cc",
+  "consumer_manifest_sha256": "7a10db40034c15f18636b588f7a0e9a854a94292b1120e27b4b989c9eb3a10f2",
+  "producer_manifest_sha256": null,
+  "harness_tests_passed": 30,
+  "helper_lifecycle_scenarios_passed": 10,
+  "session_lifecycle_scenarios_passed": 6,
+  "sandbox_probe": {
+    "status": "PASS",
+    "loopback": "PASS",
+    "external_tcp": {
+      "denied": true,
+      "errno": 1
+    },
+    "wildcard_bind": {
+      "denied": false
+    },
+    "sdk_write": {
+      "denied": true,
+      "errno": 1
+    },
+    "fixture_write": "PASS",
+    "process_observer": {
+      "status": "PASS",
+      "backend": "libproc"
+    }
+  },
+  "owned_tcp_listeners": {
+    "3180": [
+      "127.0.0.1:49190"
+    ]
+  },
+  "live_module_observation_count": 4,
+  "plugin_install_name": "/Users/runner/work/lean4/lean4/build/stage2/lean-beam-native/src/lean-beam/.lake/toolchain-build/lib/libbeam_Beam_LSP.dylib",
+  "plugin_install_name_note": "Producer path retained as identity metadata; loaded dependencies and live plugin paths pass SDK/system checks. A relocatable install name is a suggested Beam cleanup.",
+  "payload_sizes_bytes": {
+    "bin/lean-beam": 1264816,
+    "bin/beam-daemon": 2747984,
+    "bin/lean-beam-mcp": 4187192,
+    "lib/lean-beam/libbeam_Beam_LSP.dylib": 812992,
+    "lib/lean-beam/LICENSE": 9159,
+    "lib/lean-beam/provenance.json": 2101
+  },
+  "payload_total_bytes": 9024244,
+  "minimum_os_baseline_qualified": false,
+  "suite": "macos-functional",
+  "status": "PASS",
+  "release_qualified": false,
+  "qualification_status": "BLOCKED",
+  "lean_sha": "c632e66d90a83f33568e4a8705b8ad57c5d82c2b",
+  "beam_sha": "b184cb0b906b0b7ac92054d79475dfebcf90920e",
+  "pending": [
+    "P01 independent producer attestation",
+    "P16 other platforms/formats",
+    "P17 publication reconciliation",
+    "P16 minimum supported OS baseline"
+  ],
+  "results": [
+    {
+      "case": "inventory",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:44:00.785366+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.7566931619999764
+    },
+    {
+      "case": "identity",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:44:01.542657+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 1.0918188400000304
+    },
+    {
+      "case": "Mach-O dependencies",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:44:02.635713+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 6.828303901000027
+    },
+    {
+      "case": "CLI and live plugin",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:44:09.468060+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 32.185524074
+    },
+    {
+      "case": "MCP self-check",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:44:41.670769+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 2.0289323540000055
+    },
+    {
+      "case": "P04/P05 CLI edits and recovery",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:44:43.701511+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 115.82556478100003
+    },
+    {
+      "case": "P06 save and replay",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:46:39.586352+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 46.32849657700001
+    },
+    {
+      "case": "P07 deferred save",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:47:25.938547+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 44.881397531999994
+    },
+    {
+      "case": "P08 independent MCP",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:48:10.843348+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 4.587950499999977
+    },
+    {
+      "case": "P09 workspace isolation",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:48:15.434592+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 7.545060380999985
+    },
+    {
+      "case": "P10/P11 offline target selectors",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:48:22.984233+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 1.3625383600000305
+    },
+    {
+      "case": "P12 damaged payload",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:48:24.348121+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.5450731849999784
+    },
+    {
+      "case": "P13 generation and cleanup",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:48:24.894076+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 30.37867983500007
+    },
+    {
+      "case": "P14 owned sessions",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:48:55.288613+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 141.60005046699996
+    },
+    {
+      "case": "P15 helper lifetimes",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:51:16.961970+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 86.6826435810001
+    },
+    {
+      "case": "unchanged payload",
+      "status": "PASS",
+      "started_at": "2026-10-19T16:52:43.688073+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.08288346699998783
+    }
+  ]
+}
