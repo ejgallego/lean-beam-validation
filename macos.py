@@ -48,13 +48,19 @@ def verify_loopback_listeners(text):
     return listeners
 
 
-def verify_macho_dependencies(text, prefix):
+def verify_macho_dependencies(text, prefix, install_name=None):
+    dependencies = []
     for line in text.splitlines():
         if not line[:1].isspace():
             continue
         dependency = line.strip().split(" (compatibility version", 1)[0]
         if not dependency:
             continue
+        dependencies.append(dependency)
+    if install_name is not None:
+        require(dependencies and dependencies[0] == install_name, "Mach-O install name does not match otool -D")
+        dependencies = dependencies[1:]
+    for dependency in dependencies:
         if dependency.startswith(("@rpath/", "@loader_path/", "@executable_path/")):
             continue
         path = Path(dependency)
@@ -76,10 +82,16 @@ class MacPilot(Pilot):
             actual = self.run(["/usr/bin/lipo", "-archs", path]).strip()
             require(architecture in actual.split(), f"wrong native architecture: {relative}: {actual}")
             linked = self.run(["/usr/bin/otool", "-L", path])
-            verify_macho_dependencies(linked, self.prefix)
+            install_name = None
+            if relative == self.target["plugin"]:
+                identity = self.run(["/usr/bin/otool", "-D", path]).splitlines()
+                require(len(identity) == 2, "expected one native plugin install name")
+                install_name = identity[1].strip()
             declarations[relative] = {"architecture": actual, "dependencies": linked,
+                                      "install_name": install_name,
                                       "load_commands": self.run(["/usr/bin/otool", "-l", path])}
-        write_json(self.output / "loader-declarations.json", declarations)
+            write_json(self.output / "loader-declarations.json", declarations)
+            verify_macho_dependencies(linked, self.prefix, install_name=install_name)
 
     def loaded_modules(self, owner_pid):
         observations = {}

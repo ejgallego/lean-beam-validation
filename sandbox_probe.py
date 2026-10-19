@@ -8,6 +8,10 @@ import json
 import os
 from pathlib import Path
 import socket
+import subprocess
+import sys
+
+from processes import process_tree, running
 
 
 def observe_permission(action, label):
@@ -57,6 +61,18 @@ def main():
         writable.write_text("fixture writes are admitted\n")
         writable.unlink()
         observations["fixture_write"] = "PASS"
+        if sys.platform == "darwin":
+            with subprocess.Popen([sys.executable, "-c", "import sys; sys.stdin.buffer.read()"],
+                                  stdin=subprocess.PIPE, stdout=subprocess.DEVNULL) as child:
+                try:
+                    if child.pid not in process_tree(os.getpid()) or not running(child.pid):
+                        raise AssertionError("owned live child not observed through libproc")
+                finally:
+                    child.terminate()
+                    child.wait(timeout=5)
+                if running(child.pid):
+                    raise AssertionError("reaped child still reported running")
+            observations["process_observer"] = {"status": "PASS", "backend": "libproc"}
         observations["status"] = "PASS"
     finally:
         args.output.write_text(json.dumps(observations, indent=2) + "\n")

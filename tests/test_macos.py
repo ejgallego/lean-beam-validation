@@ -1,5 +1,6 @@
 from pathlib import Path
 import errno
+import ctypes
 import json
 import subprocess
 import sys
@@ -8,7 +9,7 @@ import unittest
 
 from macos import dylib_paths, verify_macho_dependencies, verify_live_images, verify_loopback_listeners
 from run_macos import sandbox_profile
-from processes import descendants, parse_parents
+from processes import descendants, parse_parents, DarwinProcesses
 from sandbox_probe import denied, observe_permission
 from validate import ValidationError
 
@@ -32,6 +33,19 @@ __TEXT  200000-300000 /usr/lib/libSystem.B.dylib
             for path in ["/opt/homebrew/lib/libgmp.dylib", "/producer/lib/libLake_shared.dylib", "../../build/libLean.dylib"]:
                 with self.subTest(path=path), self.assertRaises(ValidationError):
                     verify_macho_dependencies(f"beam:\n\t{path} (compatibility version 1.0.0, current version 1.0.0)", prefix)
+
+    def test_dylib_install_name_is_distinct_from_loaded_dependencies(self):
+        prefix = Path('/tmp/sdk').resolve()
+        identifier = '/producer/build/libbeam_Beam_LSP.dylib'
+        text = f'plugin:\n\t{identifier} (compatibility version 0.0.0, current version 0.0.0)\n\t@rpath/libLake_shared.dylib (compatibility version 0.0.0, current version 0.0.0)\n'
+        verify_macho_dependencies(text, prefix, install_name=identifier)
+        with self.assertRaises(ValidationError):
+            verify_macho_dependencies(text, prefix)
+        with self.assertRaises(ValidationError):
+            verify_macho_dependencies(text + f'\t{identifier} (compatibility version 0.0.0, current version 0.0.0)\n',
+                                      prefix, install_name=identifier)
+        with self.assertRaises(ValidationError):
+            verify_macho_dependencies(text, prefix, install_name='@rpath/different.dylib')
 
     def test_profile_quotes_sdk_path_without_broad_outbound_permission(self):
         sdk = Path('/private/tmp/SDK "quoted" λ')
@@ -75,6 +89,44 @@ __TEXT  200000-300000 /usr/lib/libSystem.B.dylib
         with self.assertRaisesRegex(AssertionError, "unexpected failure"):
             denied(unavailable_network, "external TCP")
 
+    def test_libproc_permission_and_short_reads_do_not_mean_a_process_exited(self):
+        from unittest.mock import Mock
+        library = Mock()
+        observer = DarwinProcesses(library)
+        def refused(*args):
+            ctypes.set_errno(errno.EPERM)
+            return 0
+        library.proc_pidinfo.side_effect = refused
+        with self.assertRaises(PermissionError):
+            observer.running(123)
+        library.proc_listpids.side_effect = refused
+        with self.assertRaises(PermissionError):
+            observer.children(123)
+        def exited(*args):
+            ctypes.set_errno(errno.ESRCH)
+            return 0
+        library.proc_pidinfo.side_effect = exited
+        self.assertFalse(observer.running(123))
+        library.proc_pidinfo.side_effect = None
+        library.proc_pidinfo.return_value = 4
+        with self.assertRaisesRegex(RuntimeError, "short process info"):
+            observer.running(123)
+
+    def test_libproc_child_listing_retries_a_full_buffer(self):
+        from unittest.mock import Mock
+        library = Mock()
+        observer = DarwinProcesses(library)
+        sizes = []
+        def list_children(kind, parent, buffer, size):
+            sizes.append(size)
+            if len(sizes) == 1:
+                return size
+            buffer[0], buffer[1] = 20, 30
+            return 2 * ctypes.sizeof(ctypes.c_int)
+        library.proc_listpids.side_effect = list_children
+        self.assertEqual(observer.children(10), {20, 30})
+        self.assertGreater(sizes[1], sizes[0])
+
     @unittest.skipUnless(sys.platform == "darwin", "requires native macOS Seatbelt")
     def test_native_sandbox_preflight_before_archive_download(self):
         with tempfile.TemporaryDirectory(prefix="beam-preflight-") as directory:
@@ -102,6 +154,7 @@ __TEXT  200000-300000 /usr/lib/libSystem.B.dylib
             self.assertTrue(observations["external_tcp"]["denied"])
             self.assertTrue(observations["sdk_write"]["denied"])
             self.assertEqual(observations["fixture_write"], "PASS")
+            self.assertEqual(observations["process_observer"]["status"], "PASS")
             self.assertEqual(manifest.read_bytes(), b"{}\n")
 
 

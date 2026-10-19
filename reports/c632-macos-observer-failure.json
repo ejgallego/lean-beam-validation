@@ -1,0 +1,204 @@
+{
+  "copyright": "Copyright (c) 2026 Lean FRO, LLC. Apache-2.0.",
+  "validation_run": "https://github.com/ejgallego/lean-beam-validation/actions/runs/39285634132",
+  "harness_revision": "e937bf18da147a5a36a781d669b14d1c33facdf4",
+  "status": "FAIL",
+  "release_qualified": false,
+  "qualification_status": "BLOCKED",
+  "producer_repository": "leanprover/lean4",
+  "producer_run": 39253075497,
+  "diagnosis": [
+    "otool -L includes the plugin install name before loaded dependencies; the validator misclassified that identifier.",
+    "Seatbelt refused executing /bin/ps, blocking live loader and process cleanup observations."
+  ],
+  "fix": [
+    "Distinguish the plugin install name using otool -D and retain its original bytes in evidence.",
+    "Observe owned children and process state directly through libproc, with native preflight and strict observation errors."
+  ],
+  "beam_advisory": "Consider setting a relocatable LC_ID_DYLIB for the installed macOS plugin before freezing inventory hashes. The absolute identifier alone does not establish a failed runtime dependency lookup.",
+  "upstream_writes": false,
+  "platforms": [
+    {
+      "platform": "macos-aarch64",
+      "archive_sha256": "e994ec7ed35ee2a1aaa7d4cf4970d7866eee7657b0773290486a96738569adc2",
+      "producer_artifact_id": 12187632501,
+      "sandbox_probe": {
+        "status": "PASS",
+        "loopback": "PASS",
+        "external_tcp": {
+          "denied": true,
+          "errno": 1
+        },
+        "wildcard_bind": {
+          "denied": false
+        },
+        "sdk_write": {
+          "denied": true,
+          "errno": 1
+        },
+        "fixture_write": "PASS"
+      },
+      "results": [
+        {
+          "case": "inventory",
+          "status": "PASS"
+        },
+        {
+          "case": "identity",
+          "status": "PASS"
+        },
+        {
+          "case": "Mach-O dependencies",
+          "status": "FAIL",
+          "error": "external Mach-O dependency: /Users/runner/work/lean4/lean4/build/stage2/lean-beam-native/src/lean-beam/.lake/toolchain-build/lib/libbeam_Beam_LSP.dylib"
+        },
+        {
+          "case": "CLI and live plugin",
+          "status": "FAIL",
+          "error": "[Errno 1] Operation not permitted: '/bin/ps'"
+        },
+        {
+          "case": "MCP self-check",
+          "status": "PASS"
+        },
+        {
+          "case": "P04/P05 CLI edits and recovery",
+          "status": "PASS"
+        },
+        {
+          "case": "P06 save and replay",
+          "status": "PASS"
+        },
+        {
+          "case": "P07 deferred save",
+          "status": "PASS"
+        },
+        {
+          "case": "P08 independent MCP",
+          "status": "PASS"
+        },
+        {
+          "case": "P09 workspace isolation",
+          "status": "PASS"
+        },
+        {
+          "case": "P10/P11 offline target selectors",
+          "status": "PASS"
+        },
+        {
+          "case": "P12 damaged payload",
+          "status": "PASS"
+        },
+        {
+          "case": "P13 generation and cleanup",
+          "status": "PASS"
+        },
+        {
+          "case": "P14 owned sessions",
+          "status": "FAIL",
+          "error": "[Errno 1] Operation not permitted: '/bin/ps'"
+        },
+        {
+          "case": "P15 helper lifetimes",
+          "status": "FAIL",
+          "error": "[Errno 1] Operation not permitted: '/bin/ps'"
+        },
+        {
+          "case": "unchanged payload",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "platform": "macos-x86_64",
+      "archive_sha256": "dc042b8210038aa29beb1da4bb173432d8caafb1e285be6ec6705bbf81fd34a5",
+      "producer_artifact_id": 12197122553,
+      "sandbox_probe": {
+        "status": "PASS",
+        "loopback": "PASS",
+        "external_tcp": {
+          "denied": true,
+          "errno": 1
+        },
+        "wildcard_bind": {
+          "denied": false
+        },
+        "sdk_write": {
+          "denied": true,
+          "errno": 1
+        },
+        "fixture_write": "PASS"
+      },
+      "results": [
+        {
+          "case": "inventory",
+          "status": "PASS"
+        },
+        {
+          "case": "identity",
+          "status": "PASS"
+        },
+        {
+          "case": "Mach-O dependencies",
+          "status": "FAIL",
+          "error": "external Mach-O dependency: /Users/runner/work/lean4/lean4/build/stage2/lean-beam-native/src/lean-beam/.lake/toolchain-build/lib/libbeam_Beam_LSP.dylib"
+        },
+        {
+          "case": "CLI and live plugin",
+          "status": "FAIL",
+          "error": "[Errno 1] Operation not permitted: '/bin/ps'"
+        },
+        {
+          "case": "MCP self-check",
+          "status": "PASS"
+        },
+        {
+          "case": "P04/P05 CLI edits and recovery",
+          "status": "PASS"
+        },
+        {
+          "case": "P06 save and replay",
+          "status": "PASS"
+        },
+        {
+          "case": "P07 deferred save",
+          "status": "PASS"
+        },
+        {
+          "case": "P08 independent MCP",
+          "status": "PASS"
+        },
+        {
+          "case": "P09 workspace isolation",
+          "status": "PASS"
+        },
+        {
+          "case": "P10/P11 offline target selectors",
+          "status": "PASS"
+        },
+        {
+          "case": "P12 damaged payload",
+          "status": "PASS"
+        },
+        {
+          "case": "P13 generation and cleanup",
+          "status": "PASS"
+        },
+        {
+          "case": "P14 owned sessions",
+          "status": "FAIL",
+          "error": "[Errno 1] Operation not permitted: '/bin/ps'"
+        },
+        {
+          "case": "P15 helper lifetimes",
+          "status": "FAIL",
+          "error": "[Errno 1] Operation not permitted: '/bin/ps'"
+        },
+        {
+          "case": "unchanged payload",
+          "status": "PASS"
+        }
+      ]
+    }
+  ]
+}
