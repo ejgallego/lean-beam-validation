@@ -7,7 +7,7 @@ on:
       operation:
         description: Validation operation
         type: choice
-        options: [self-test, linux-pilot]
+        options: [self-test, linux-pilot, linux-functional]
         default: self-test
       producer_repository:
         description: Read existing artifacts from this repository
@@ -15,16 +15,16 @@ on:
         options: [leanprover/lean4, ejgallego/lean4]
         default: leanprover/lean4
       producer_run:
-        description: Exact existing producer run ID (pilot only)
+        description: Exact existing producer run ID (artifact checks)
         type: string
       artifact_id:
-        description: Exact existing Linux x86_64 artifact ID (pilot only)
+        description: Exact existing Linux x86_64 artifact ID
         type: string
       lean_sha:
-        description: Expected full Lean commit SHA (pilot only)
+        description: Expected full Lean commit SHA
         type: string
       beam_sha:
-        description: Expected full Beam commit SHA (pilot only)
+        description: Expected full Beam commit SHA
         type: string
       producer_manifest_sha256:
         description: Independent producer provenance digest, if available
@@ -48,14 +48,15 @@ jobs:
           persist-credentials: false
       - name: Compile and test harness
         run: |
-          python3 -m compileall -q fetch.py run_linux.py validate.py tests
+          python3 -m compileall -q fetch.py run_linux.py validate.py functional.py mcp_client.py tests
           python3 -m unittest discover -s tests -v
 
   linux-pilot:
-    if: github.repository == 'ejgallego/lean-beam-validation' && github.event_name == 'workflow_dispatch' && inputs.operation == 'linux-pilot'
+    name: ${{ inputs.operation }}
+    if: github.repository == 'ejgallego/lean-beam-validation' && github.event_name == 'workflow_dispatch' && startsWith(inputs.operation, 'linux-')
     needs: self-test
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v6
         with:
@@ -63,7 +64,7 @@ jobs:
       - name: Install consumer tools
         run: |
           sudo apt-get update
-          sudo apt-get install --yes bubblewrap zstd
+          sudo apt-get install --yes bubblewrap zstd elan
           # This disposable VM needs an unprivileged offline test namespace.
           if [[ -f /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]]; then
             sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
@@ -83,15 +84,17 @@ jobs:
         run: |
           python3 fetch.py --repository "$PRODUCER_REPOSITORY" --run "$PRODUCER_RUN" \
             --artifact "$ARTIFACT_ID" --lean-sha "$LEAN_SHA" --output downloads/candidate
-      - name: Run offline artifact pilot
+      - name: Run offline artifact checks
         env:
           LEAN_SHA: ${{ inputs.lean_sha }}
           BEAM_SHA: ${{ inputs.beam_sha }}
           MANIFEST_SHA: ${{ inputs.producer_manifest_sha256 }}
           BUILD_ID: ${{ inputs.build_id }}
+          OPERATION: ${{ inputs.operation }}
         run: |
           archive=$(cat downloads/candidate/archive-path.txt)
           extra=()
+          if [[ "$OPERATION" == linux-functional ]]; then extra+=(--tier functional); fi
           if [[ -n "$MANIFEST_SHA" ]]; then extra+=(--producer-manifest-sha256 "$MANIFEST_SHA"); fi
           if [[ -n "$BUILD_ID" ]]; then extra+=(--build-id "$BUILD_ID"); fi
           python3 run_linux.py --archive "$archive" --lean-sha "$LEAN_SHA" \
@@ -106,7 +109,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: linux-pilot-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ inputs.operation }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: evidence/
           if-no-files-found: error
           retention-days: 30

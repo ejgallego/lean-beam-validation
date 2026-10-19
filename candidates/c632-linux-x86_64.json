@@ -1,0 +1,15 @@
+{
+  "producer_repository": "leanprover/lean4",
+  "producer_run": 39253075497,
+  "artifact_id": 12188027068,
+  "artifact_name": "build-Linux release",
+  "platform": "linux-x86_64",
+  "lean_sha": "c632e66d90a83f33568e4a8705b8ad57c5d82c2b",
+  "beam_sha": "b184cb0b906b0b7ac92054d79475dfebcf90920e",
+  "inner_archive_filename": "lean-4.37.0-pre-linux.tar.zst",
+  "inner_archive_sha256": "2443132d6437a10fa9cce31c665a24f14f24c9bf4ee1e3627ca15904511ef1ea",
+  "wrapper_sha256": "ec3ad22ff2a592d4be914cbb07c931a8b2d74af9ee7b6eacb6f04f142b11bbf6",
+  "producer_manifest_sha256": null,
+  "qualification_status": "BLOCKED",
+  "note": "Experimental candidate. Pilot success does not establish release qualification. Independent producer provenance and the full native platform matrix remain required."
+}

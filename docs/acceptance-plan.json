@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
   "updated_at_utc": "2026-10-19T13:50:44.745261+00:00",
-  "status": "Planning specification; initial Linux pilot implemented separately, full P01-P17 qualification pending.",
+  "status": "Linux pilot and functional suites implemented; independent producer evidence, native platform matrix, and publication reconciliation remain pending.",
   "candidate": {
     "lean_sha": "c632e66d90a83f33568e4a8705b8ad57c5d82c2b",
     "beam_sha": "b184cb0b906b0b7ac92054d79475dfebcf90920e",
@@ -13,9 +13,9 @@
   "objective": "Demonstrate that the exact distributable SDK archives contain and run Beam correctly without producer paths, a separate Beam install, rebuilding Beam, or runtime downloads.",
   "coverage_today": {
     "lean_ci": "Staged package smoke/inventory/identity/selector checks; its relocation fixture links standard libraries back to the build SDK. Packaging/upload precedes those tests.",
-    "local_linux": "Normal install plus a local full-SDK archive tested with producer worktree hidden, clean environment and network disabled. Useful harness prototype, not acceptance evidence for a GitHub CI-produced archive.",
+    "local_linux": "Exact CI-produced Linux archive consumed locally with producer worktree hidden, clean environment, read-only SDK and networking disabled.",
     "beam_native_tests": "Provide save/replay, MCP generation/reuse and installed helper scenarios to adapt; the build-oriented native script is not an artifact-only harness as-is.",
-    "artifact_gate": "Initial Linux pilot implemented in this repository; full qualification gate and other native platforms remain pending."
+    "artifact_gate": "Initial hosted Linux pilot passed in ejgallego/lean-beam-validation run 39271577415. Expanded Linux functional suite is separate from full qualification."
   },
   "execution_environment": {
     "consumer": "Fresh native runner per architecture, validation harness at a path different from original producer checkout; original source/build/install locations asserted absent.",
@@ -771,5 +771,13 @@
     "upstream_access": "GET requests for existing artifacts only",
     "upstream_writes": "require explicit user approval",
     "published_qualification_status": "not qualified"
+  },
+  "implementation": {
+    "pilot": "validate.py",
+    "linux_functional": "functional.py",
+    "independent_mcp_client": "mcp_client.py",
+    "linux_isolation": "run_linux.py",
+    "upstream_activity": "GET requests only; all dispatches and evidence in ejgallego/lean-beam-validation",
+    "release_qualified": false
   }
 }

@@ -3,6 +3,7 @@
 """Initial artifact-only smoke checks. This is not the full qualification suite."""
 
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -112,7 +113,8 @@ class Pilot:
 
     def case(self, name, action):
         start = time.monotonic()
-        result = {"case": name, "status": "PASS"}
+        result = {"case": name, "status": "PASS", "started_at": datetime.now(timezone.utc).isoformat(),
+                  "identity_file": "input.json"}
         try:
             action()
         except Exception as error:
@@ -268,7 +270,14 @@ def main():
     parser.add_argument("--producer-manifest-sha256")
     parser.add_argument("--build-id")
     parser.add_argument("--forbidden-path", action="append", type=Path, default=[])
-    Pilot(parser.parse_args()).execute()
+    parser.add_argument("--tier", choices=["pilot", "functional"], default="pilot")
+    parser.add_argument("--foreign-prefix", type=Path)
+    args = parser.parse_args()
+    if args.tier == "functional":
+        from functional import FunctionalSuite
+        FunctionalSuite(args).execute()
+    else:
+        Pilot(args).execute()
 
 
 if __name__ == "__main__":
