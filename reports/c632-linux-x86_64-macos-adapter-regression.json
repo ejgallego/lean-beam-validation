@@ -1,0 +1,153 @@
+{
+  "copyright": "Copyright (c) 2026 Lean FRO, LLC. Apache-2.0.",
+  "execution": "local Linux regression after adding the macOS adapter",
+  "evidence_directory": "evidence/macos-adapter-linux-regression",
+  "hosted_evidence_artifact": null,
+  "harness_revision": "3f9706952e5f46e9fa6917c23f320c585dc98c68",
+  "harness_worktree_dirty": false,
+  "harness_files": {
+    "processes.py": "4c1ba82aef1e1a17d38687ec1cc5c2769cee29bceed1cc10747532db2b31046c",
+    "candidate.py": "04a8f4c79fb49b91069673ebe663ed28a2bfccdc826a0173c2cb45745e24526b",
+    "sandbox_probe.py": "1442216c430e444695896a320e5748bbcac2773cb5ac6a0b638dcbc77b4fef66",
+    "functional.py": "361214232284ef98d3bf8ca34230c17e764f48f117bfbea0d35d4a3bbe9fc1e0",
+    "run_linux.py": "bcfbbb7da9a8dbc788ae4d166e24a2fe5ad3299d23b731b4c89f4f691c62cf27",
+    "macos.py": "9df8cd8f0e02117507baa23491bdea81e5a4c88e44bce28853b20a6e0a0d043c",
+    "validate.py": "b804ac557349b136d967ccfe4a5ff283f86758b1f0966ea0ef92341f0ac8d2a2",
+    "mcp_client.py": "08ec949b58f99a96ac7acf5b1e5005d8f7fca7bdf43423ede995bc8392e471c0",
+    "fetch.py": "715cb08ee6b622bd5507e539a691e5d9c324bd1b6ad1c0f144a0ad7fb092b81f",
+    "run_macos.py": "87f415ff53e97c5f575143ec72f34cabe8ac4ec459b8d69929af571e95b2ec3c"
+  },
+  "producer_repository": "leanprover/lean4",
+  "producer_run": 39253075497,
+  "producer_artifact_id": 12188027068,
+  "wrapper_sha256": "ec3ad22ff2a592d4be914cbb07c931a8b2d74af9ee7b6eacb6f04f142b11bbf6",
+  "archive_sha256": "2443132d6437a10fa9cce31c665a24f14f24c9bf4ee1e3627ca15904511ef1ea",
+  "platform": "linux-x86_64",
+  "producer_manifest_sha256": null,
+  "helper_lifecycle_scenarios_passed": 10,
+  "suite": "linux-functional",
+  "status": "PASS",
+  "release_qualified": false,
+  "qualification_status": "BLOCKED",
+  "lean_sha": "c632e66d90a83f33568e4a8705b8ad57c5d82c2b",
+  "beam_sha": "b184cb0b906b0b7ac92054d79475dfebcf90920e",
+  "pending": [
+    "P01 independent producer attestation",
+    "P16 other platforms/formats",
+    "P17 publication reconciliation"
+  ],
+  "results": [
+    {
+      "case": "inventory",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:53:17.986471+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.15342778799822554
+    },
+    {
+      "case": "identity",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:53:18.140280+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.3598022370133549
+    },
+    {
+      "case": "ELF dependencies",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:53:18.500365+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.7027633679681458
+    },
+    {
+      "case": "CLI and live plugin",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:53:19.203349+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 12.779524554032832
+    },
+    {
+      "case": "MCP self-check",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:53:31.983205+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 1.0170724830240943
+    },
+    {
+      "case": "P04/P05 CLI edits and recovery",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:53:33.000655+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 49.81852643296588
+    },
+    {
+      "case": "P06 save and replay",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:54:22.819713+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 21.276197035971563
+    },
+    {
+      "case": "P07 deferred save",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:54:44.096291+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 27.32335989398416
+    },
+    {
+      "case": "P08 independent MCP",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:55:11.420144+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 2.173875276988838
+    },
+    {
+      "case": "P09 workspace isolation",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:55:13.594548+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 3.583344574959483
+    },
+    {
+      "case": "P10/P11 offline target selectors",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:55:17.178480+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.8053464840049855
+    },
+    {
+      "case": "P12 damaged payload",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:55:17.984178+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.2442032050457783
+    },
+    {
+      "case": "P13 generation and cleanup",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:55:18.228839+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 14.703953597985674
+    },
+    {
+      "case": "P14 owned sessions",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:55:32.933268+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 80.91003296501003
+    },
+    {
+      "case": "P15 helper lifetimes",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:56:53.843566+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 66.81444092898164
+    },
+    {
+      "case": "unchanged payload",
+      "status": "PASS",
+      "started_at": "2026-10-19T15:58:00.658394+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.013932960981037468
+    }
+  ]
+}
