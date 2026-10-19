@@ -32,6 +32,22 @@ def verify_live_images(paths, prefix):
         require(system_library(path) or Path(path).resolve().is_relative_to(prefix), f"external live dylib: {path}")
 
 
+def verify_loopback_listeners(text):
+    listeners = {}
+    pid = None
+    for line in text.splitlines():
+        if line.startswith("p"):
+            pid = str(int(line[1:]))
+        elif line.startswith("n"):
+            endpoint = line[1:]
+            require(pid is not None, "TCP listener has no process identity")
+            require(re.fullmatch(r"(?:127\.0\.0\.1|\[::1\]):[1-9][0-9]*", endpoint),
+                    f"non-loopback Beam listener: {endpoint}")
+            listeners.setdefault(pid, []).append(endpoint)
+    require(listeners, "no owned TCP listeners observed")
+    return listeners
+
+
 def verify_macho_dependencies(text, prefix):
     for line in text.splitlines():
         if not line[:1].isspace():
@@ -69,7 +85,11 @@ class MacPilot(Pilot):
         observations = {}
         plugin = str((self.prefix / self.target["plugin"]).resolve())
         found_plugin = False
-        for pid in sorted(process_tree(owner_pid)):
+        pids = sorted(process_tree(owner_pid))
+        listening = self.run(["/usr/sbin/lsof", "-nP", "-a", "-p", ",".join(map(str, pids)),
+                              "-iTCP", "-sTCP:LISTEN", "-Fpn"])
+        write_json(self.output / "loaded-listeners.json", verify_loopback_listeners(listening))
+        for pid in pids:
             self.counter += 1
             stem = self.output / f"vmmap-{pid}"
             result = subprocess.run(["/usr/bin/vmmap", "-w", str(pid)], text=True, capture_output=True, timeout=30)

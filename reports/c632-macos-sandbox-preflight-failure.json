@@ -1,0 +1,44 @@
+{
+  "copyright": "Copyright (c) 2026 Lean FRO, LLC. Apache-2.0.",
+  "validation_run": "https://github.com/ejgallego/lean-beam-validation/actions/runs/39281809704",
+  "harness_revision": "3f9706952e5f46e9fa6917c23f320c585dc98c68",
+  "status": "FAIL",
+  "release_qualified": false,
+  "qualification_status": "BLOCKED",
+  "producer_repository": "leanprover/lean4",
+  "producer_run": 39253075497,
+  "lean_sha": "c632e66d90a83f33568e4a8705b8ad57c5d82c2b",
+  "beam_sha": "b184cb0b906b0b7ac92054d79475dfebcf90920e",
+  "diagnosis": "Harness preflight incorrectly required wildcard bind denial under Seatbelt host-local rules. Both architectures failed before Beam execution.",
+  "fix": "Retain external TCP/SDK-write denial gates, record wildcard bind permission as an observation, and reject wildcard/non-loopback listeners in live Beam process evidence.",
+  "evidence_artifacts": [
+    {
+      "id": 12201746668,
+      "sha256": "808ac9593ddf0880258ef7176266df2c904ff7fce52fae735be31aa072e264db"
+    },
+    {
+      "id": 12200862669,
+      "sha256": "65cfad4cf5d55553b9547e246072a5c6e3488216487e3cf86bf96158c2152429"
+    }
+  ],
+  "platforms": [
+    {
+      "architecture": "arm64",
+      "producer_artifact_id": 12187632501,
+      "wrapper_sha256": "cc7f9e3397f09ad64e72a43a0b05ce09b757886bd522526b4b744be849b61ea5",
+      "inner_archive_filename": "lean-4.37.0-pre-darwin_aarch64.tar.zst",
+      "archive_sha256": "e994ec7ed35ee2a1aaa7d4cf4970d7866eee7657b0773290486a96738569adc2",
+      "failure": "AssertionError: wildcard bind was permitted",
+      "beam_executed": false
+    },
+    {
+      "architecture": "x86_64",
+      "producer_artifact_id": 12197122553,
+      "wrapper_sha256": "0f61c84eea15f4cb7ee8a24547bc797b149e6fe77436e675e5f590b4f8770264",
+      "inner_archive_filename": "lean-4.37.0-pre-darwin.tar.zst",
+      "archive_sha256": "dc042b8210038aa29beb1da4bb173432d8caafb1e285be6ec6705bbf81fd34a5",
+      "failure": "AssertionError: wildcard bind was permitted",
+      "beam_executed": false
+    }
+  ]
+}

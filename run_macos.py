@@ -1,6 +1,6 @@
 # Copyright (c) 2026 Lean FRO, LLC. All rights reserved.
 # Released under Apache 2.0 license as described in the file LICENSE.
-"""Consume an SDK on a fresh native Mac under a measured loopback-only sandbox."""
+"""Consume an SDK on a fresh native Mac with external TCP and SDK writes denied."""
 
 import argparse
 import hashlib
@@ -113,7 +113,7 @@ def main():
                 "BEAM_INSTALL_BUNDLE_DIR": str(scratch / "forbidden-install-cache"), "LANG": "en_US.UTF-8",
             }
             write_json(evidence / "isolation.json", {
-                "network": "Seatbelt: loopback TCP only; external connections denied",
+                "network": "Seatbelt: host-local TCP allowed; external TCP denied; wildcard bind permission measured",
                 "sdk": "Seatbelt: file writes denied", "environment": environment,
                 "producer_paths_asserted_absent": list(map(str, forbidden)),
                 "consumer_platform": dict(zip(["system", "node", "release", "version", "machine"], os.uname())),

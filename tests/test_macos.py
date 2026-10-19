@@ -1,10 +1,12 @@
 from pathlib import Path
+import errno
 import tempfile
 import unittest
 
-from macos import dylib_paths, verify_macho_dependencies, verify_live_images
+from macos import dylib_paths, verify_macho_dependencies, verify_live_images, verify_loopback_listeners
 from run_macos import sandbox_profile
 from processes import descendants, parse_parents
+from sandbox_probe import denied, observe_permission
 from validate import ValidationError
 
 
@@ -48,6 +50,27 @@ __TEXT  200000-300000 /usr/lib/libSystem.B.dylib
         self.assertEqual(descendants(10, parents), {10, 20, 30})
         with self.assertRaises(ValueError):
             parse_parents("not a process listing")
+
+    def test_live_tcp_listeners_must_be_loopback(self):
+        self.assertEqual(verify_loopback_listeners("p10\nn127.0.0.1:4567\np20\nn[::1]:5678\n"),
+                         {"10": ["127.0.0.1:4567"], "20": ["[::1]:5678"]})
+        for endpoint in ["*:4567", "0.0.0.0:4567", "[::]:4567", "192.0.2.1:4567"]:
+            with self.subTest(endpoint=endpoint), self.assertRaises(ValidationError):
+                verify_loopback_listeners(f"p10\nn{endpoint}\n")
+        with self.assertRaises(ValidationError):
+            verify_loopback_listeners("")
+
+    def test_wildcard_bind_is_observed_but_required_denials_still_fail_closed(self):
+        self.assertEqual(observe_permission(lambda: None, "wildcard bind"), {"denied": False})
+        with self.assertRaisesRegex(AssertionError, "external TCP was permitted"):
+            denied(lambda: None, "external TCP")
+        def permission_error():
+            raise PermissionError(errno.EPERM, "denied by sandbox")
+        self.assertEqual(denied(permission_error, "SDK write access"), {"denied": True, "errno": errno.EPERM})
+        def unavailable_network():
+            raise OSError(errno.ENETUNREACH, "no route")
+        with self.assertRaisesRegex(AssertionError, "unexpected failure"):
+            denied(unavailable_network, "external TCP")
 
 
 if __name__ == "__main__":
