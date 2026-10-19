@@ -1,5 +1,8 @@
 from pathlib import Path
 import errno
+import json
+import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -71,6 +74,35 @@ __TEXT  200000-300000 /usr/lib/libSystem.B.dylib
             raise OSError(errno.ENETUNREACH, "no route")
         with self.assertRaisesRegex(AssertionError, "unexpected failure"):
             denied(unavailable_network, "external TCP")
+
+    @unittest.skipUnless(sys.platform == "darwin", "requires native macOS Seatbelt")
+    def test_native_sandbox_preflight_before_archive_download(self):
+        with tempfile.TemporaryDirectory(prefix="beam-preflight-") as directory:
+            root = Path(directory).resolve()
+            sdk = root / "SDK with spaces λ"
+            manifest = sdk / "lib/lean-beam/provenance.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_bytes(b"{}\n")
+            for name in ["home", "tmp"]:
+                (root / name).mkdir()
+            profile = root / "sandbox.sb"
+            profile.write_text(sandbox_profile(sdk))
+            output = root / "probe.json"
+            probe = Path(__file__).resolve().parent.parent / "sandbox_probe.py"
+            result = subprocess.run(["/usr/bin/sandbox-exec", "-f", str(profile), sys.executable,
+                                     str(probe), "--prefix", str(sdk), "--output", str(output)],
+                                    env={"PATH": "/usr/bin:/bin:/usr/sbin:/sbin", "HOME": str(root / "home"),
+                                         "TMPDIR": str(root / "tmp"), "LANG": "en_US.UTF-8"},
+                                    capture_output=True, text=True, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr +
+                             (output.read_text() if output.exists() else ""))
+            observations = json.loads(output.read_text())
+            self.assertEqual(observations["status"], "PASS")
+            self.assertEqual(observations["loopback"], "PASS")
+            self.assertTrue(observations["external_tcp"]["denied"])
+            self.assertTrue(observations["sdk_write"]["denied"])
+            self.assertEqual(observations["fixture_write"], "PASS")
+            self.assertEqual(manifest.read_bytes(), b"{}\n")
 
 
 if __name__ == "__main__":

@@ -39,6 +39,8 @@ The separate **Validate macOS artifacts** workflow consumes explicit candidate r
 
 `macos.py` checks native architecture with `lipo`, declared dependencies/load commands with `otool`, live plugin/library paths with `vmmap`, and owned TCP listeners with `lsof`. The functional tier reuses the Linux scenarios with macOS process observations and `.dylib` dependencies. Canonical paths account for `/var` versus `/private/var`; functional selectors also exercise a second alias of the SDK. The initial Intel and ARM runs failed in the harness preflight because it incorrectly required wildcard binds to be denied; Beam had not yet run. The [failure report](reports/c632-macos-sandbox-preflight-failure.json) retains the archive identities and diagnosis. macOS acceptance remains pending.
 
+The self-tests include a native Seatbelt preflight against a tiny SDK fixture, before any archive download. It checks actual networking and file-write decisions with the same profile and probe used by the artifact consumer. This test is skipped on Linux; static profile checks do not establish macOS sandbox behavior.
+
 The network profile uses the host-local address syntax in [Codex's Seatbelt implementation](https://github.com/openai/codex/blob/main/codex-rs/sandboxing/src/seatbelt.rs); [SwiftPM's sandbox implementation](https://github.com/swiftlang/swift-package-manager/blob/main/Sources/Basics/Sandbox.swift) also documents independent network and read-only directory rules. [MXC's Seatbelt backend documentation](https://github.com/microsoft/mxc/blob/main/docs/seatbelt/seatbelt-backend.md) describes the host-local filtering limitation. Actual probe results, including partial results on failure, are retained with each consumer run.
 
 ## Run locally
