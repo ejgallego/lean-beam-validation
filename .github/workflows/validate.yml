@@ -1,0 +1,107 @@
+# Copyright (c) 2026 Lean FRO, LLC. Released under Apache 2.0.
+name: Validate artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Validation operation
+        type: choice
+        options: [self-test, linux-pilot]
+        default: self-test
+      producer_repository:
+        description: Read existing artifacts from this repository
+        type: choice
+        options: [leanprover/lean4, ejgallego/lean4]
+        default: leanprover/lean4
+      producer_run:
+        description: Exact existing producer run ID (pilot only)
+        type: string
+      artifact_id:
+        description: Exact existing Linux x86_64 artifact ID (pilot only)
+        type: string
+      lean_sha:
+        description: Expected full Lean commit SHA (pilot only)
+        type: string
+      beam_sha:
+        description: Expected full Beam commit SHA (pilot only)
+        type: string
+      producer_manifest_sha256:
+        description: Independent producer provenance digest, if available
+        type: string
+      build_id:
+        description: Independent producer build ID, if available
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  self-test:
+    if: github.repository == 'ejgallego/lean-beam-validation' && github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Compile and test harness
+        run: |
+          python3 -m compileall -q fetch.py run_linux.py validate.py tests
+          python3 -m unittest discover -s tests -v
+
+  linux-pilot:
+    if: github.repository == 'ejgallego/lean-beam-validation' && github.event_name == 'workflow_dispatch' && inputs.operation == 'linux-pilot'
+    needs: self-test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Install consumer tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes bubblewrap zstd
+      - name: Record harness revision
+        run: |
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/harness-revision.txt
+      - name: Download existing artifact using read requests
+        env:
+          GH_TOKEN: ${{ secrets.ARTIFACT_READ_TOKEN || github.token }}
+          PRODUCER_REPOSITORY: ${{ inputs.producer_repository }}
+          PRODUCER_RUN: ${{ inputs.producer_run }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          LEAN_SHA: ${{ inputs.lean_sha }}
+        run: |
+          python3 fetch.py --repository "$PRODUCER_REPOSITORY" --run "$PRODUCER_RUN" \
+            --artifact "$ARTIFACT_ID" --lean-sha "$LEAN_SHA" --output downloads/candidate
+      - name: Run offline artifact pilot
+        env:
+          LEAN_SHA: ${{ inputs.lean_sha }}
+          BEAM_SHA: ${{ inputs.beam_sha }}
+          MANIFEST_SHA: ${{ inputs.producer_manifest_sha256 }}
+          BUILD_ID: ${{ inputs.build_id }}
+        run: |
+          archive=$(cat downloads/candidate/archive-path.txt)
+          extra=()
+          if [[ -n "$MANIFEST_SHA" ]]; then extra+=(--producer-manifest-sha256 "$MANIFEST_SHA"); fi
+          if [[ -n "$BUILD_ID" ]]; then extra+=(--build-id "$BUILD_ID"); fi
+          python3 run_linux.py --archive "$archive" --lean-sha "$LEAN_SHA" \
+            --beam-sha "$BEAM_SHA" --output evidence "${extra[@]}"
+      - name: Retain download identity
+        if: always()
+        run: |
+          if [[ -f downloads/candidate/identity.json ]]; then
+            cp downloads/candidate/identity.json evidence/artifact-identity.json
+          fi
+      - name: Upload this repository's evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-pilot-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 30

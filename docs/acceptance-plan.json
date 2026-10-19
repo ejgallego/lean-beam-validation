@@ -1,0 +1,775 @@
+{
+  "schema_version": 3,
+  "updated_at_utc": "2026-10-19T13:50:44.745261+00:00",
+  "status": "Planning specification; initial Linux pilot implemented separately, full P01-P17 qualification pending.",
+  "candidate": {
+    "lean_sha": "c632e66d90a83f33568e4a8705b8ad57c5d82c2b",
+    "beam_sha": "b184cb0b906b0b7ac92054d79475dfebcf90920e",
+    "ci_run_url": "https://github.com/leanprover/lean4/actions/runs/39253075497",
+    "ci_run_id": 39253075497,
+    "pin_may_change": "Minor fixes produce a new candidate and artifact identity; evidence stays attached to the old digests.",
+    "freeze_policy": "Current SHAs identify the example candidate only; freeze a new identity tuple when pending fixes settle."
+  },
+  "objective": "Demonstrate that the exact distributable SDK archives contain and run Beam correctly without producer paths, a separate Beam install, rebuilding Beam, or runtime downloads.",
+  "coverage_today": {
+    "lean_ci": "Staged package smoke/inventory/identity/selector checks; its relocation fixture links standard libraries back to the build SDK. Packaging/upload precedes those tests.",
+    "local_linux": "Normal install plus a local full-SDK archive tested with producer worktree hidden, clean environment and network disabled. Useful harness prototype, not acceptance evidence for a GitHub CI-produced archive.",
+    "beam_native_tests": "Provide save/replay, MCP generation/reuse and installed helper scenarios to adapt; the build-oriented native script is not an artifact-only harness as-is.",
+    "artifact_gate": "Initial Linux pilot implemented in this repository; full qualification gate and other native platforms remain pending."
+  },
+  "execution_environment": {
+    "consumer": "Fresh native runner per architecture, validation harness at a path different from original producer checkout; original source/build/install locations asserted absent.",
+    "inputs": [
+      "explicit CI run/attempt and artifact ID",
+      "inner tar.zst/zip filename and SHA-256, separately from any GitHub wrapper digest",
+      "expected Lean/Beam SHAs and platform/build configuration",
+      "versioned artifact-only Python/client fixture bundle",
+      "real elan executable and offline fixtures where target-selection cases require it",
+      "producer-recorded manifest SHA-256 and buildId, captured before packing and retained separately from the archive"
+    ],
+    "isolation": [
+      "separate test user/profile and isolated ELAN_HOME",
+      "clear Lean/Lake/Beam and dynamic-loader overrides for baseline",
+      "network disabled during behavior checks; collect attempted provisioning evidence",
+      "start without dependency caches; only a test-project .lake may be produced by the extracted SDK",
+      "space for archive, two independent SDK roots, disposable mutation copies and test-project outputs",
+      "do not rename or hide active developer build directories; use fresh runners or owned namespaces"
+    ],
+    "harness_contract": [
+      "accept --prefix and expected identity inputs",
+      "invoke that SDK directly, without recopying its executables or symlinking libraries back to a producer",
+      "no Beam checkout .lake products or source-side installer/build invocation",
+      "generate small Lean/Lake fixtures in scratch",
+      "external watchdogs, deterministic cleanup, machine-readable per-case results and retained failure logs"
+    ]
+  },
+  "platform_matrix": [
+    {
+      "platform": "linux-x86_64",
+      "artifact_name": "build-Linux release",
+      "formats": "tar.zst",
+      "current_build_snapshot": "success",
+      "artifact_acceptance": "not yet run on hosted CI archive",
+      "blocking_note": ""
+    },
+    {
+      "platform": "linux-aarch64",
+      "artifact_name": "build-Linux aarch64",
+      "formats": "tar.zst",
+      "current_build_snapshot": "failure",
+      "artifact_acceptance": "not yet run on hosted CI archive",
+      "blocking_note": "Current combined checker build failed before packaging; await fixed candidate/artifact."
+    },
+    {
+      "platform": "macos-x86_64",
+      "artifact_name": "build-macOS",
+      "formats": "tar.zst",
+      "current_build_snapshot": "in_progress",
+      "artifact_acceptance": "not yet run on hosted CI archive",
+      "blocking_note": ""
+    },
+    {
+      "platform": "macos-aarch64",
+      "artifact_name": "build-macOS aarch64",
+      "formats": "tar.zst",
+      "current_build_snapshot": "success",
+      "artifact_acceptance": "not yet run on hosted CI archive",
+      "blocking_note": ""
+    },
+    {
+      "platform": "windows-x86_64",
+      "artifact_name": "build-Windows",
+      "formats": "tar.zst; zip when produced",
+      "current_build_snapshot": "in_progress",
+      "artifact_acceptance": "not yet run on hosted CI archive",
+      "blocking_note": ""
+    }
+  ],
+  "acceptance_cases": [
+    {
+      "id": "A1",
+      "area": "Archive identity and inventory",
+      "tier": "smoke",
+      "expected": "Consume exact CI tar.zst/zip identified by run, attempt, artifact ID and SHA-256. Provenance schema 3 has expected Beam source SHA, native compiler revision, buildId and role mapping; all five listed artifacts match hashes, provenance is present verbatim, private inventory is exactly the six native files. Record full SDK configuration and archive digest; matching compiler Git hashes alone do not prove ABI/configuration identity. Compare extracted provenance SHA-256 with the producer-recorded digest rather than regenerating a new record after packaging.",
+      "evidence": [
+        "archive identity tuple",
+        "provenance bytes/hash",
+        "file inventory, hashes and sizes",
+        "CLI compiled/loaded/source/build identity"
+      ]
+    },
+    {
+      "id": "A2",
+      "area": "Independent extraction and relocation",
+      "tier": "smoke",
+      "expected": "Run the extracted SDK directly from a fresh path containing spaces and Unicode. Producer source/build/install paths are absent. No symlink/junction escapes into producer paths, developer caches or another SDK. POSIX executable permissions survive extraction; macOS canonical path aliases and Windows native/MSYS path conversion behave consistently.",
+      "evidence": [
+        "unavailable producer path assertions",
+        "extraction location and link inventory",
+        "permissions",
+        "direct SDK executable paths"
+      ]
+    },
+    {
+      "id": "A3",
+      "area": "Runtime library and plugin loading",
+      "tier": "smoke",
+      "expected": "Run CLI, MCP and daemon, load the LSP plugin through a real Lean session. Declared dependencies and live loaded modules resolve Beam and Lean/Lake code inside the extracted SDK. Only documented host-system libraries may resolve externally. Repeat with runtime environment overrides cleared and misleading standalone Beam paths.",
+      "evidence": [
+        "readelf/ldd or otool or PE import output",
+        "live module paths where supported",
+        "doctor paths",
+        "successful plugin-backed probe"
+      ]
+    },
+    {
+      "id": "A4",
+      "area": "CLI proof-engine workflow",
+      "tier": "smoke",
+      "expected": "With no lean-toolchain file, the containing SDK works without elan invocation or provisioning. Start a session, sync/update a Lean file, run a successful proof probe, edit and resync it, reject a stale version, surface deliberate Lean diagnostics, then stop cleanly. An invalid probe must not poison the next valid one.",
+      "evidence": [
+        "CLI version and doctor",
+        "structured sync/probe/error results",
+        "updated source observed",
+        "bounded owner shutdown"
+      ]
+    },
+    {
+      "id": "A5",
+      "area": "Native Lake save and replay",
+      "tier": "qualification",
+      "expected": "Use a dependency-free two-module Lake library plus executable, built only by the extracted SDK. Import a dependency and a metaprogram, save a changed module, verify Lake replays the saved output and both interpreted import and native executable observe the new value. Where deferred compilation is supported, save rejects that setup explicitly without changing existing artifact/trace bytes.",
+      "evidence": [
+        "selected Lake/Lean paths",
+        "save result and trace/IR signature",
+        "Lake replay log",
+        "native executable output",
+        "before/after artifact hashes for unsupported save"
+      ]
+    },
+    {
+      "id": "A6",
+      "area": "MCP consumer workflow and reuse",
+      "tier": "smoke_then_qualification",
+      "expected": "Drive the extracted lean-beam-mcp with an independent stdio client: initialize, tools/list, lean_sync, proof/goal query, subsequent edit/sync and close/drop. Keep stdout protocol-only, test supported framing, and interleave two workspaces. Change one workspace selector to a foreign installation while the process is alive: admission fails without retargeting existing handles or corrupting the other valid workspace.",
+      "evidence": [
+        "client transcript with protocol version",
+        "stdout/stderr separation",
+        "two-workspace assertions",
+        "live reuse rejection and cleanup"
+      ]
+    },
+    {
+      "id": "A7",
+      "area": "Locally installed target selection",
+      "tier": "qualification",
+      "expected": "Use isolated ELAN_HOME and real elan toolchain links prepared before offline execution. Cover absent selector; matching SDK; a second alias/symlink/junction to the same SDK; existing foreign SDK (including another extraction with the same compiler revision); unavailable custom selector; floating selector without a local resolution; inherited ELAN_TOOLCHAIN conflict; malformed/dangling selector. Failures are distinct and never trigger download or silently fall back to bundled Lean.",
+      "evidence": [
+        "real linked SDK roots",
+        "selector-case outcome table",
+        "no provisioning/network/cache activity"
+      ]
+    },
+    {
+      "id": "A8",
+      "area": "Missing payload and immutable generation",
+      "tier": "qualification",
+      "expected": "On disposable copies, inventory validation rejects missing or modified executable/plugin/license before execution. Missing daemon/plugin or SDK shared libraries fail instead of loading a fallback. A live CLI/MCP session rejects replacement provenance/build generation; stop/drop/cleanup still works after admission fails or metadata is malformed. Do not require runtime to rehash arbitrary tampered files on every operation: immutable payload hash verification belongs to the acceptance gate.",
+      "evidence": [
+        "per-case hash/admission rejection",
+        "missing-library startup failure",
+        "generation/reuse rejection",
+        "cleanup with invalid metadata",
+        "unchanged original archive digest"
+      ]
+    },
+    {
+      "id": "A9",
+      "area": "Lifecycle, cancellation and process ownership",
+      "tier": "qualification",
+      "expected": "Graceful stop/EOF/cancellation cleans owned processes and resources. Forced owner/client exit leaves no live owned worker; stale session files, if any, must be recognized and recovered safely on next start. Unrelated controlled sessions must remain healthy. Use external watchdogs and retained logs, including Windows job/process-group ownership.",
+      "evidence": [
+        "child/process inventory before/after",
+        "watchdog result",
+        "timeout/cancellation transcript",
+        "Windows ownership/cleanup observations"
+      ]
+    },
+    {
+      "id": "A10",
+      "area": "Platform formats and consumer environment",
+      "tier": "qualification",
+      "expected": "Qualify Linux x86_64/aarch64, macOS x86_64/aarch64, and Windows x86_64 on native runners. On Windows include CRLF source, a normal PowerShell/native client environment without MSYS helping runtime discovery, and both tar.zst and zip when actually published. For formats of the same build compare extracted file hashes/inventory. Check supported Linux loader/GLIBC baseline and macOS architecture/relative loader paths against existing Lean release policy.",
+      "evidence": [
+        "platform/OS/architecture and environment",
+        "format parity table",
+        "CRLF probe result",
+        "baseline compatibility observations"
+      ]
+    },
+    {
+      "id": "A11",
+      "area": "Published payload and size report",
+      "tier": "release_gate",
+      "expected": "Report per-file and total uncompressed Beam sizes, full archive size and absence of duplicate Lean/Lake runtime copies. Payload-only compressed measurements must be labeled as standalone, not net distribution growth. Any strip/sign/loader-byte transformation must happen before the frozen Beam inventory is produced; later byte changes fail acceptance. Redownload final published assets and match their digests to the accepted archive set.",
+      "evidence": [
+        "six-file final size/hash table per platform",
+        "archive digests",
+        "publication digest comparison",
+        "reviewed payload/layout changes"
+      ]
+    }
+  ],
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Prepare reusable consumer harness",
+      "deliverables": [
+        "extract the existing local isolated archive proof into a portable prefix-driven harness",
+        "adapt only public-consumer scenarios from Beam native regressions",
+        "define versioned result JSON and evidence bundle",
+        "keep source package smoke as an independent fast check",
+        "capture the native build manifest digest/buildId before packing so consumer provenance equality is independently checkable without the producer filesystem"
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Pilot exact hosted Linux x86_64 archive",
+      "deliverables": [
+        "download by immutable artifact identity and hash inner archive",
+        "run A1-A4 plus MCP smoke on clean extraction",
+        "run save/replay, selectors, negative and lifecycle cases",
+        "fix harness problems without rebuilding the candidate to paper over packaging failures"
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Expand to all five native targets",
+      "deliverables": [
+        "run the same acceptance suite on native arch-matched runners",
+        "exercise platform-specific loader, CRLF, alias/junction and process ownership cases",
+        "qualify zip parity when a zip is actually produced; mark absent PR-only formats N/A with reason"
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Freeze final candidate and reconcile publication",
+      "deliverables": [
+        "repeat required consumer checks for each final archive digest after minor fixes",
+        "require relevant CI success and a complete five-platform acceptance table",
+        "redownload the final distributed assets and match the tested digests",
+        "present results for user merge/release approval"
+      ]
+    }
+  ],
+  "evidence_required": [
+    "Lean SHA, Beam SHA, buildId, native compiler revision and build configuration",
+    "CI run/attempt, artifact ID, archive filename and SHA-256",
+    "OS/architecture and extraction/forbidden paths",
+    "manifest bytes, complete inventory, per-file hashes/sizes and executable/link metadata",
+    "loader declarations/live loaded-module paths and stdout/stderr/client transcripts",
+    "per-case pass/fail/N/A with rationale, watchdog/cleanup outcomes",
+    "timestamps, harness revision and links to exact logs; old-head results retained separately",
+    "producer manifest digest/buildId and comparison with extracted provenance bytes"
+  ],
+  "completion_gate": [
+    "all applicable smoke, qualification and publication cases pass for every shipped platform/format",
+    "required CI failures fixed or explicitly resolved; a skipped/missing job is not acceptance",
+    "manifest/inventory and tested-to-published archive digests match; no unknown payload or undeclared runtime copies",
+    "no producer/developer-cache fallback, runtime download, generation retargeting or leaked owned workers",
+    "new archive digest or build generation requires fresh evidence even if the source Git SHA is unchanged",
+    "draft/merge/release status changes require the user authorization already established for those actions"
+  ],
+  "scope_boundary": "Validation implementation, workflows and evidence live in ejgallego/lean-beam-validation. Official leanprover repositories are read-only sources; any upstream write or workflow dispatch requires explicit user approval.",
+  "detail_revision": "concrete fixture/case/evidence specification; planning only",
+  "fixtures": {
+    "golden_sdk": "Fresh extraction of exact inner CI archive; normal checks use it directly, read-only where supported.",
+    "foreign_sdk": "Independent complete extraction at another canonical root; same compiler hash deliberately does not make it the same installation.",
+    "mutation_sdk": "Separate writable extraction for destructive cases. Never modify hard-linked files shared with the golden SDK, another case or a developer build.",
+    "project_files": {
+      "lakefile.toml": "name = \"beam_artifact_acceptance\"\n\n[leanOptions]\nmaxRecDepth = 777\n\n[[lean_lib]]\nname = \"Demo\"\n\n[[lean_exe]]\nname = \"nativeCheck\"\nroot = \"NativeCheck\"\n",
+      "Demo/Dep.lean": "module\n\n/-! Dependency used by the artifact acceptance fixture. -/\n\npublic def dependencyValue : Nat := 40\n",
+      "Demo.lean": "module\n\npublic import Lean\npublic import Demo.Dep\n\n/-! Exercise artifact SDK elaboration, plugin use and saved module output. -/\n\nopen Lean Elab Command\n\nelab \"#configured\" : command => do\n  unless maxRecDepth.get (\u2190 getOptions) == 777 do\n    throwError \"missing structured Lake option\"\n\n#configured\n\n@[noinline] public def value : Nat := dependencyValue + 1\n\nexample : True := by\n  trivial\n",
+      "Check.lean": "module\n\nimport Demo\n\n/-! Observe the saved module through an ordinary SDK import. -/\n\n#eval value\n",
+      "NativeCheck.lean": "module\n\nimport Demo\n\n/-! Observe the saved module through a native consumer executable. -/\n\ndef main : IO Unit := IO.println value\n"
+    },
+    "source_edit": "Change dependencyValue + 1 to dependencyValue + 2; expected observable result changes from 41 to 42.",
+    "coordinates": "Compute probe position from the fixture marker; adapt newline encoding without hard-coded offsets.",
+    "scope": "Compile only this small consumer Lean/Lake project. Beam executables, plugin and runtime inputs always come from the archive."
+  },
+  "detailed_cases": [
+    {
+      "id": "P01",
+      "area": "A1",
+      "fixture": "Exact downloaded CI artifact",
+      "steps": [
+        "Record run ID/attempt, artifact ID, inner archive filename and digest.",
+        "Compare expected Lean/Beam SHAs, platform and producer manifest digest/buildId.",
+        "Extract and hash each manifest member; check roles and exact six-file private payload."
+      ],
+      "expected": [
+        "Digest and every member hash match.",
+        "CLI/MCP/daemon/plugin/license roles are present; provenance matches producer digest.",
+        "No undeclared Beam payload or additional Lean/Lake runtime copy."
+      ],
+      "evidence": [
+        "identity.json",
+        "inventory.json",
+        "producer-manifest.sha256"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P02",
+      "area": "A2",
+      "fixture": "Clean extraction in a path containing spaces and Unicode",
+      "steps": [
+        "Assert original producer src/build/install paths are absent.",
+        "Launch SDK programs by absolute extracted paths with isolated profile/ELAN_HOME and runtime environment cleared.",
+        "Disable network; keep projects and scratch writable; keep golden SDK read-only where supported."
+      ],
+      "expected": [
+        "Containing SDK works without a prior Beam installation, source checkout or downloads.",
+        "SDK files remain unchanged."
+      ],
+      "evidence": [
+        "environment.json",
+        "forbidden-paths.json",
+        "before-after-hashes.json"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P03",
+      "area": "A3",
+      "fixture": "CLI, MCP, daemon and a live plugin-backed session",
+      "steps": [
+        "Collect declared library dependencies.",
+        "Start the programs and observe live loaded-module paths where supported.",
+        "Compare selected Lean/Lake/plugin paths against extracted SDK root; allow documented system libraries."
+      ],
+      "expected": [
+        "All Beam/Lean/Lake code comes from the extracted SDK or its ordinary project outputs.",
+        "No build-prefix, developer SDK or standalone Beam runtime is loaded."
+      ],
+      "evidence": [
+        "loader-declarations.txt",
+        "loaded-modules.json",
+        "doctor.txt"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P04",
+      "area": "A4",
+      "fixture": "Two-module project, initially with no lean-toolchain selector",
+      "steps": [
+        "Start foreground serve; wait for ready under an external watchdog.",
+        "Update Demo.lean; use returned version in a proof probe.",
+        "Edit value from dependencyValue + 1 to dependencyValue + 2; close/resync, query again."
+      ],
+      "expected": [
+        "Probe succeeds in the expected context.",
+        "Updated source is observed; the session uses the containing SDK without invoking elan."
+      ],
+      "evidence": [
+        "owner.log",
+        "update-and-probe.jsonl"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P05",
+      "area": "A4",
+      "fixture": "Same project after a source edit",
+      "steps": [
+        "Probe with an intentionally stale/invalid version.",
+        "Introduce a deterministic Lean error and inspect diagnostics.",
+        "Restore valid source and run a valid probe."
+      ],
+      "expected": [
+        "Version mismatch is rejected.",
+        "Lean error appears as diagnostics, without confusing it with transport/startup failure.",
+        "Next valid operation succeeds; no poisoned state."
+      ],
+      "evidence": [
+        "negative-probe.jsonl",
+        "diagnostics.json",
+        "recovery.json"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P06",
+      "area": "A5",
+      "fixture": "Lake package with imported module and configured command elaborator",
+      "steps": [
+        "Use extracted Lake to build Demo.",
+        "Edit value so its result changes from 41 to 42; sync/save it with Beam.",
+        "Use extracted Lake to rebuild/replay Demo, import it in Check.lean and build/run nativeCheck."
+      ],
+      "expected": [
+        "Configured Lake option reaches elaboration.",
+        "Save outputs and trace are coherent; expected Lake replay occurs.",
+        "Both interpreted import and native executable print 42."
+      ],
+      "evidence": [
+        "save.json",
+        "lake-replay.log",
+        "check-output.txt",
+        "native-output.txt",
+        "compiler-invocation.log"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P07",
+      "area": "A5",
+      "fixture": "Same project with deferred compilation explicitly enabled, if supported",
+      "steps": [
+        "Record existing module artifact and trace hashes.",
+        "Sync an edited source and request save.",
+        "Compare hashes; finish through the documented Lake path."
+      ],
+      "expected": [
+        "Explicit saveUnsupportedSetup/deferredCompilation diagnostic is returned.",
+        "Existing valid artifact family and trace remain unchanged.",
+        "Ordinary Lake build remains usable."
+      ],
+      "evidence": [
+        "unsupported-save.json",
+        "artifact-hashes-before-after.json"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P08",
+      "area": "A6",
+      "fixture": "Independent stdio MCP client using extracted lean-beam-mcp",
+      "steps": [
+        "Negotiate supported initialize/framing and call tools/list.",
+        "Call lean_sync, perform a proof/goal query, edit and repeat.",
+        "Close/drop and finish with EOF."
+      ],
+      "expected": [
+        "Required tools and schemas are advertised.",
+        "Actual results contain expected source/proof information.",
+        "stdout contains valid protocol frames only; logging goes to stderr."
+      ],
+      "evidence": [
+        "mcp-transcript.jsonl",
+        "mcp-stderr.log",
+        "capabilities.json"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P09",
+      "area": "A6",
+      "fixture": "Two workspace roots in one long-lived MCP process",
+      "steps": [
+        "Open and query both roots with distinct values.",
+        "Interleave updates/probes.",
+        "Change one root selector to a real foreign SDK and retry reuse; keep using the other root."
+      ],
+      "expected": [
+        "Workspace handles and values stay distinct.",
+        "Foreign target admission fails without retargeting retained handles.",
+        "The unrelated matching workspace remains usable."
+      ],
+      "evidence": [
+        "workspace-reuse-transcript.jsonl"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P10",
+      "area": "A7",
+      "fixture": "Real isolated elan links prepared before offline execution",
+      "steps": [
+        "Exercise absent selector, matching SDK link and a second alias to the same canonical SDK.",
+        "Repeat with conflicting inherited ELAN_TOOLCHAIN values.",
+        "Remove/trap elan executable discovery after links are created."
+      ],
+      "expected": [
+        "No-selector and matching cases succeed; canonical aliases remain matching.",
+        "Inherited override cannot hide an explicit foreign selector or reject a matching one.",
+        "Runtime selection uses local context without executing elan or provisioning."
+      ],
+      "evidence": [
+        "selector-cases.json",
+        "subprocess-observations.json"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P11",
+      "area": "A7",
+      "fixture": "A real existing foreign SDK, plus an unlinked custom name",
+      "steps": [
+        "Use another independently extracted SDK root, including the same-compiler-revision case.",
+        "Select it and attempt runtime work.",
+        "Select unavailable custom/floating names and malformed/dangling selector markers."
+      ],
+      "expected": [
+        "Foreign installation is rejected as not a member.",
+        "Unavailable target is reported as unavailable locally; floating/invalid selectors fail according to their documented category.",
+        "No silent bundled fallback, registry entry, download or stale handle reuse."
+      ],
+      "evidence": [
+        "selector-failures.json",
+        "registry-before-after.json"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P12",
+      "area": "A8",
+      "fixture": "Disposable independent payload copies",
+      "steps": [
+        "Remove or alter one listed artifact and run acceptance preflight.",
+        "Separately remove daemon or plugin and attempt startup.",
+        "Separately remove required SDK shared libraries and launch each frontend/daemon."
+      ],
+      "expected": [
+        "Acceptance hash/inventory gate catches altered payload before execution.",
+        "Missing runtime components cause failure; no alternate installation supplies them.",
+        "Original archive/golden extraction stays untouched."
+      ],
+      "evidence": [
+        "fault-matrix.json",
+        "startup-failures.txt",
+        "golden-hashes.json"
+      ],
+      "disposable_mutation_copy_required": true
+    },
+    {
+      "id": "P13",
+      "area": "A8",
+      "fixture": "Disposable SDK with a live session/MCP client",
+      "steps": [
+        "Replace provenance with a different build generation while retaining live handles.",
+        "Attempt reuse; then make provenance malformed and request supported stop/drop cleanup."
+      ],
+      "expected": [
+        "Generation change rejects reuse and cannot retarget the process.",
+        "Cleanup remains possible after admission fails.",
+        "No claim is made that every operation rehashes arbitrary artifact bytes."
+      ],
+      "evidence": [
+        "generation-transcript.jsonl",
+        "cleanup-result.json"
+      ],
+      "disposable_mutation_copy_required": true
+    },
+    {
+      "id": "P14",
+      "area": "A9",
+      "fixture": "Owned session A and independent control session B",
+      "steps": [
+        "Exercise normal stop, client EOF and advertised cancellation.",
+        "Terminate A owner/client/helper at deterministic fixture checkpoints.",
+        "Check owned process tree and then start A afresh."
+      ],
+      "expected": [
+        "Only the operation/session owner's processes are terminated.",
+        "Control session B remains healthy.",
+        "Graceful shutdown removes session resources; forced death leaves no live owned workers and any stale marker is recognized/recoverable on restart."
+      ],
+      "evidence": [
+        "process-tree-before-after.json",
+        "cancellation.jsonl",
+        "restart.json",
+        "watchdog.log"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P15",
+      "area": "A9",
+      "fixture": "Same installed helper/ownership cases across platforms",
+      "steps": [
+        "Use deterministic blocking fixtures with release markers rather than timing-only sleeps.",
+        "Test request timeout and forced helper exit.",
+        "Repeat five short start/stop/EOF cycles after the basic case passes."
+      ],
+      "expected": [
+        "No hang or accumulating workers/handles/descriptors.",
+        "Windows job/process-group ownership survives early stream closure and child exit.",
+        "External watchdog captures logs and fails a hung case."
+      ],
+      "evidence": [
+        "helper-lifetime.json",
+        "process-observations.json",
+        "watchdog.log"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P16",
+      "area": "A10",
+      "fixture": "Actual delivered formats and normal consumer shells",
+      "steps": [
+        "Test every shipped architecture natively.",
+        "Use canonical temporary-directory alias on macOS; spaces/Unicode and CRLF on Windows.",
+        "Run Windows baseline from ordinary PowerShell without MSYS assisting DLL or compiler discovery.",
+        "Compare tar/zip extracted content for the same build when both are produced."
+      ],
+      "expected": [
+        "Relative loader and path behavior is correct.",
+        "Consumer native program uses the packaged compiler/toolchain where supplied.",
+        "Same-build archives carry identical file contents and required executable semantics."
+      ],
+      "evidence": [
+        "platform.json",
+        "format-parity.json",
+        "native-compiler-path.txt"
+      ],
+      "disposable_mutation_copy_required": false
+    },
+    {
+      "id": "P17",
+      "area": "A11",
+      "fixture": "Final accepted and published archive set",
+      "steps": [
+        "Measure actual per-file and full archive sizes.",
+        "Check six-file Beam inventory and shared-library reuse.",
+        "Redownload each final published file and compare its digest to accepted identity."
+      ],
+      "expected": [
+        "Final bytes match acceptance evidence.",
+        "Any signing/stripping/loader rewrite occurs before frozen manifest construction; a later byte change is a gate failure.",
+        "Payload-only compressed measurements are explicitly labeled and not treated as net archive growth."
+      ],
+      "evidence": [
+        "size-report.json",
+        "published-digests.json"
+      ],
+      "disposable_mutation_copy_required": false
+    }
+  ],
+  "harness_interface": {
+    "entrypoint": "proposed artifact_acceptance.py --prefix SDK --expected EXPECTED.json --output EVIDENCE_DIR --tier smoke|qualification",
+    "expected_fields": [
+      "lean_sha",
+      "beam_sha",
+      "platform",
+      "archive_sha256",
+      "producer_manifest_sha256",
+      "build_id",
+      "build_configuration",
+      "artifact_id",
+      "run_id",
+      "run_attempt"
+    ],
+    "suites": {
+      "smoke": [
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P08"
+      ],
+      "qualification": [
+        "P06",
+        "P07",
+        "P09",
+        "P10",
+        "P11",
+        "P12",
+        "P13",
+        "P14",
+        "P15",
+        "P16"
+      ],
+      "publication": [
+        "P17"
+      ]
+    },
+    "result_fields": [
+      "case_id",
+      "artifact_identity",
+      "harness_revision",
+      "fixture_id",
+      "platform",
+      "start_time",
+      "duration",
+      "status",
+      "expected_outcome",
+      "observed_outcome",
+      "log_paths",
+      "cleanup_result"
+    ],
+    "status_values": [
+      "PASS",
+      "FAIL",
+      "BLOCKED",
+      "NOT_APPLICABLE"
+    ],
+    "applicability": "No zip yet or a genuinely unsupported deferred-compilation feature can be N/A with explicit capability/reason; a required unavailable platform/artifact is BLOCKED, never PASS."
+  },
+  "watchdogs": {
+    "proposal_only": true,
+    "startup_and_ordinary_request_seconds": 120,
+    "consumer_native_build_seconds": 300,
+    "graceful_shutdown_seconds": 30,
+    "tuning": "Tune after first native pilot if justified; retain timeout evidence and never convert a timed-out case to a silent pass. These are hang watchdogs, not performance targets."
+  },
+  "execution_order": [
+    "Freeze expected producer identity and retain manifest digest before packing.",
+    "Download/hash exact inner archive; run inventory and extraction gates before executing it.",
+    "Run smoke directly on golden extraction with clean/offline environment.",
+    "Run save/MCP/selector/ownership qualification in independent test projects.",
+    "Run fault/generation cases on separate mutation extractions; verify golden payload unchanged afterward.",
+    "Record per-platform verdict and complete evidence; reconcile final published archive digests."
+  ],
+  "failure_triage": {
+    "packaging": [
+      "missing member",
+      "wrong manifest hash",
+      "mode/link/path escape",
+      "loader dependency outside allowed SDK/system roots"
+    ],
+    "runtime": [
+      "valid SDK cannot sync/probe/save/replay",
+      "MCP protocol contamination",
+      "selector/generation retargeting",
+      "owned worker leak or failed recovery"
+    ],
+    "environment_or_harness": [
+      "infrastructure download failure",
+      "invalid fixture construction",
+      "unsupported runner/architecture",
+      "watchdog budget requiring justified adjustment"
+    ],
+    "rule": "Preserve first failure, classify against exact artifact identity, fix the responsible layer, and rerun affected cases plus smoke. A replacement archive/build generation needs the full required acceptance set; no passing result from an older binary is relabeled."
+  },
+  "evidence_layout": {
+    "root": "RUN-ATTEMPT/PLATFORM/ARCHIVE_SHA256/",
+    "files": [
+      "identity.json",
+      "producer-manifest.sha256",
+      "provenance.json",
+      "inventory.json",
+      "environment.json",
+      "loader-declarations.txt",
+      "loaded-modules.json",
+      "cases/Pxx/result.json",
+      "cases/Pxx/stdout.log",
+      "cases/Pxx/stderr.log",
+      "cases/Pxx/transcript.jsonl",
+      "cases/Pxx/cleanup.json",
+      "summary.json"
+    ]
+  },
+  "activity_policy": {
+    "validation_repository": "ejgallego/lean-beam-validation",
+    "triggers": [
+      "workflow_dispatch"
+    ],
+    "upstream_access": "GET requests for existing artifacts only",
+    "upstream_writes": "require explicit user approval",
+    "published_qualification_status": "not qualified"
+  }
+}
