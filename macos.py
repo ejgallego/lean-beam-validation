@@ -23,7 +23,13 @@ def dylib_paths(text):
 
 
 def system_library(path):
-    return str(path).startswith(("/usr/lib/", "/System/Library/", "/System/Volumes/Preboot/Cryptexes/OS/usr/lib/"))
+    return str(path).startswith(("/usr/lib/", "/System/Library/", "/System/Volumes/Preboot/Cryptexes/OS/usr/lib/",
+                                 "/System/Volumes/Preboot/Cryptexes/OS/System/Library/"))
+
+
+def verify_live_images(paths, prefix):
+    for path in paths:
+        require(system_library(path) or Path(path).resolve().is_relative_to(prefix), f"external live dylib: {path}")
 
 
 def verify_macho_dependencies(text, prefix):
@@ -70,11 +76,9 @@ class MacPilot(Pilot):
             stem.with_suffix(".stdout").write_text(result.stdout)
             stem.with_suffix(".stderr").write_text(result.stderr)
             paths = dylib_paths(result.stdout)
+            verify_live_images(paths, self.prefix)
             observations[str(pid)] = {"returncode": result.returncode, "paths": sorted(paths)}
             for path in paths:
-                name = Path(path).name
-                if name.startswith(("libLean", "libLake", "liblean", "libInit", "libbeam_")):
-                    require(Path(path).resolve().is_relative_to(self.prefix), f"external live Lean/Beam library: {path}")
                 if str(Path(path).resolve()) == plugin:
                     found_plugin = True
         write_json(self.output / "loaded-modules.json", observations)

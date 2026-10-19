@@ -2,7 +2,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from macos import dylib_paths, verify_macho_dependencies
+from macos import dylib_paths, verify_macho_dependencies, verify_live_images
 from run_macos import sandbox_profile
 from processes import descendants, parse_parents
 from validate import ValidationError
@@ -35,6 +35,13 @@ __TEXT  200000-300000 /usr/lib/libSystem.B.dylib
         self.assertIn('(remote ip "localhost:*")', profile)
         self.assertNotIn('(remote ip "*:*")', profile)
         self.assertIn('(deny file-write* (subpath "/private/tmp/SDK \\"quoted\\" λ"))', profile)
+
+    def test_transitive_homebrew_library_cannot_mask_missing_sdk_payload(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            prefix = Path(scratch).resolve()
+            verify_live_images({"/usr/lib/libSystem.B.dylib", str(prefix / "lib/lean/libgmp.dylib")}, prefix)
+            with self.assertRaises(ValidationError):
+                verify_live_images({"/opt/homebrew/opt/gmp/lib/libgmp.10.dylib"}, prefix)
 
     def test_process_tree_uses_parent_edges_only(self):
         parents = parse_parents("  10 1\n  20 10\n  30 20\n  40 1\n")
