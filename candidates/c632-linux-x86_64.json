@@ -11,5 +11,11 @@
   "wrapper_sha256": "ec3ad22ff2a592d4be914cbb07c931a8b2d74af9ee7b6eacb6f04f142b11bbf6",
   "producer_manifest_sha256": null,
   "qualification_status": "BLOCKED",
-  "note": "Experimental candidate. Pilot success does not establish release qualification. Independent producer provenance and the full native platform matrix remain required."
+  "note": "Experimental candidate. Pilot success does not establish release qualification. Independent producer provenance and the full native platform matrix remain required.",
+  "hosted_functional": {
+    "status": "PASS",
+    "validation_run": "https://github.com/ejgallego/lean-beam-validation/actions/runs/39274451011",
+    "harness_revision": "f70528033cb23ff89fd3e8ebb5eb44dbee511adf",
+    "report": "../reports/c632-linux-x86_64.json"
+  }
 }

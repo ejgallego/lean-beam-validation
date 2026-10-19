@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at_utc": "2026-10-19T13:50:44.745261+00:00",
+  "updated_at_utc": "2026-10-19T15:09:35.231891+00:00",
   "status": "Linux pilot and functional suites implemented; independent producer evidence, native platform matrix, and publication reconciliation remain pending.",
   "candidate": {
     "lean_sha": "c632e66d90a83f33568e4a8705b8ad57c5d82c2b",
@@ -15,7 +15,7 @@
     "lean_ci": "Staged package smoke/inventory/identity/selector checks; its relocation fixture links standard libraries back to the build SDK. Packaging/upload precedes those tests.",
     "local_linux": "Exact CI-produced Linux archive consumed locally with producer worktree hidden, clean environment, read-only SDK and networking disabled.",
     "beam_native_tests": "Provide save/replay, MCP generation/reuse and installed helper scenarios to adapt; the build-oriented native script is not an artifact-only harness as-is.",
-    "artifact_gate": "Initial hosted Linux pilot passed in ejgallego/lean-beam-validation run 39271577415. Expanded Linux functional suite is separate from full qualification."
+    "artifact_gate": "Hosted Linux pilot and functional suites pass in ejgallego/lean-beam-validation runs 39271577415 and 39274451011. Full release qualification remains blocked on producer attestation, other native platforms/formats and publication reconciliation."
   },
   "execution_environment": {
     "consumer": "Fresh native runner per architecture, validation harness at a path different from original producer checkout; original source/build/install locations asserted absent.",
@@ -49,7 +49,7 @@
       "artifact_name": "build-Linux release",
       "formats": "tar.zst",
       "current_build_snapshot": "success",
-      "artifact_acceptance": "not yet run on hosted CI archive",
+      "artifact_acceptance": "hosted pilot and 16 functional groups passed; full release qualification remains blocked",
       "blocking_note": ""
     },
     {
@@ -64,7 +64,7 @@
       "platform": "macos-x86_64",
       "artifact_name": "build-macOS",
       "formats": "tar.zst",
-      "current_build_snapshot": "in_progress",
+      "current_build_snapshot": "success",
       "artifact_acceptance": "not yet run on hosted CI archive",
       "blocking_note": ""
     },
@@ -80,9 +80,10 @@
       "platform": "windows-x86_64",
       "artifact_name": "build-Windows",
       "formats": "tar.zst; zip when produced",
-      "current_build_snapshot": "in_progress",
+      "current_build_snapshot": "failure",
       "artifact_acceptance": "not yet run on hosted CI archive",
-      "blocking_note": ""
+      "blocking_note": "Selected run has no Windows distribution: beamControlDirObj and beamProcessJobObj fail with errno.h missing under the stage2 compiler. A released-SDK test cannot qualify the actual-stage build.",
+      "producer_job_url": "https://github.com/leanprover/lean4/actions/runs/39253075497/job/118061558040"
     }
   ],
   "acceptance_cases": [
