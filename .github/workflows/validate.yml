@@ -64,6 +64,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes bubblewrap zstd
+          # This disposable VM needs an unprivileged offline test namespace.
+          if [[ -f /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          bwrap --ro-bind / / --unshare-net /usr/bin/true
       - name: Record harness revision
         run: |
           mkdir -p evidence
