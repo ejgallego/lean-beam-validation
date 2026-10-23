@@ -514,7 +514,7 @@ class FunctionalSuite(Pilot):
 
     def execute(self):
         checks = [("inventory", self.inventory), ("identity", self.identity), (self.loader_case, self.loaders),
-                  ("CLI and live plugin", self.cli), ("MCP self-check", self.mcp_self_check)]
+                  ("CLI and live plugin", self.cli), ("external MCP probe", self.mcp_probe)]
         checks += [("P04/P05 CLI edits and recovery", self.cli_edit_and_recovery),
                    ("P06 save and replay", self.save_and_replay), ("P07 deferred save", self.deferred_save),
                    ("P08 independent MCP", self.mcp_workflow), ("P09 workspace isolation", self.mcp_workspace_isolation),

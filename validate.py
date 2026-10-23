@@ -239,9 +239,19 @@ class Pilot:
                     write_json(self.output / "cleanup.json", cleanup)
             require(not cleanup["forced"] and owner.returncode == 0, "owner did not stop cleanly")
 
-    def mcp_self_check(self):
-        text = self.run([self.mcp, "--self-check", "Main.lean"], cwd=self.project)
-        require("Lean Beam MCP self-check passed" in text, "MCP self-check failed")
+    def mcp_probe(self):
+        from mcp_client import McpClient
+
+        for modern in [False, True]:
+            with McpClient([self.mcp], self.project, self.output / f"mcp-pilot-{modern}",
+                           modern=modern) as client:
+                client.initialize()
+                listed = client.request("tools/list")
+                names = {tool["name"] for tool in listed.get("result", {}).get("tools", [])}
+                require("lean_sync" in names, "MCP discovery omitted lean_sync")
+                synced = client.tool("lean_sync", self.project, {"path": "Main.lean"})
+                version = synced.get("version")
+                require(type(version) is int and version >= 0, "MCP sync omitted a valid document version")
 
     def unchanged(self):
         after = verify_inventory(self.prefix, self.args.lean_sha, self.args.beam_sha)
@@ -254,7 +264,7 @@ class Pilot:
         try:
             for name, action in [("inventory", self.inventory), ("identity", self.identity),
                                  (self.loader_case, self.loaders), ("CLI and live plugin", self.cli),
-                                 ("MCP self-check", self.mcp_self_check), ("unchanged payload", self.unchanged)]:
+                                 ("external MCP probe", self.mcp_probe), ("unchanged payload", self.unchanged)]:
                 self.case(name, action)
             passed = True
         finally:

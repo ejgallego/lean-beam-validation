@@ -43,9 +43,12 @@ def main():
     record = load_candidate(args.candidate, args.platform)
     scripts = Path(__file__).resolve().parent
     if args.phase == "fetch":
-        subprocess.run([sys.executable, scripts / "fetch.py", "--repository", record["producer_repository"],
+        command = [sys.executable, scripts / "fetch.py", "--repository", record["producer_repository"],
             "--run", str(record["producer_run"]), "--artifact", str(record["artifact_id"]),
-            "--lean-sha", record["lean_sha"], "--output", args.download], check=True)
+            "--lean-sha", record["lean_sha"], "--output", args.download]
+        if record.get("inner_archive_filename"):
+            command += ["--archive-name", record["inner_archive_filename"]]
+        subprocess.run(command, check=True)
     identity = json.loads((args.download / "identity.json").read_text())
     check_artifact(identity["artifact_metadata"], record["artifact_id"], record["producer_run"], record["lean_sha"])
     for expected_field, observed_field in [("inner_archive_sha256", "inner_archive_sha256"), ("wrapper_sha256", "wrapper_sha256")]:

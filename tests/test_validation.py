@@ -3,8 +3,10 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import argparse
+import sys
 
-from validate import ValidationError, verify_executable_dependencies, verify_inventory
+from validate import Pilot, ValidationError, verify_executable_dependencies, verify_inventory
 
 
 LEAN = "1" * 40
@@ -112,6 +114,51 @@ class InventoryTests(unittest.TestCase):
         original.symlink_to(foreign)
         with self.assertRaises(ValidationError):
             self.verify()
+
+
+class PilotMcpTests(unittest.TestCase):
+    def probe(self, root, version=1, tools=('lean_sync',)):
+        server = root / 'lean-beam-mcp'
+        server.write_text(f'''#!{sys.executable}
+import sys, json
+assert len(sys.argv) == 1, 'probe must use stdio without a private self-check flag'
+for line in sys.stdin:
+    m = json.loads(line)
+    if 'id' not in m: continue
+    result = {{}}
+    if m['method'] == 'initialize': result = {{'protocolVersion': '2025-11-25'}}
+    elif m['method'] == 'server/discover': result = {{'supportedVersions': ['2026-07-28']}}
+    elif m['method'] == 'tools/list': result = {{'tools': [{{'name': name}} for name in {list(tools)!r}]}}
+    elif m['method'] == 'tools/call': result = {{'structuredContent': {{'version': {version!r}}}}}
+    else: raise RuntimeError(m['method'])
+    print(json.dumps({{'jsonrpc': '2.0', 'id': m['id'], 'result': result}}), flush=True)
+''')
+        server.chmod(0o755)
+        args = argparse.Namespace(prefix=root, output=root / 'evidence')
+        pilot = Pilot(args)
+        pilot.mcp = server
+        pilot.project = root
+        return pilot
+
+    def test_probe_drives_both_protocols_through_external_stdio(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            pilot = self.probe(root)
+            pilot.mcp_probe()
+            for modern, admission in [(False, 'initialize'), (True, 'server/discover')]:
+                events = [json.loads(line) for line in
+                          (root / f'evidence/mcp-pilot-{modern}.jsonl').read_text().splitlines()]
+                methods = [event['message']['method'] for event in events if event['direction'] == 'client']
+                self.assertIn(admission, methods)
+                self.assertIn('tools/list', methods)
+                self.assertIn('tools/call', methods)
+
+    def test_probe_rejects_missing_sync_and_invalid_version(self):
+        for version, tools in [(1, ()), (True, ('lean_sync',)), (-1, ('lean_sync',))]:
+            with self.subTest(version=version, tools=tools), tempfile.TemporaryDirectory() as scratch:
+                pilot = self.probe(Path(scratch), version, tools)
+                with self.assertRaises(ValidationError):
+                    pilot.mcp_probe()
 
 
 class LoaderTests(unittest.TestCase):

@@ -96,7 +96,7 @@ def main():
             "BEAM_HOME": str(scratch / "forbidden-source"),
             "BEAM_BUNDLE_DIR": str(scratch / "forbidden-runtime-cache"),
             "BEAM_INSTALL_BUNDLE_DIR": str(scratch / "forbidden-install-cache"),
-            "LANG": "C.UTF-8",
+            "LANG": "C.UTF-8", "LEAN_NUM_THREADS": "2",
         }
         command += ["--clearenv"]
         for name, value in environment.items():

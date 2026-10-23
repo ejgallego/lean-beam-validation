@@ -18,7 +18,7 @@ The **pilot** checks:
 * Check schema 3, expected Lean/Beam revisions, component roles, exactly five hashed payload members plus provenance, optional externally supplied provenance digest/build ID, and absence of external SDK links.
 * Extract a complete SDK into a path containing spaces and Unicode. Use a clean environment and read-only SDK, with producer source/build trees hidden or absent. Linux uses separate PID/network namespaces; the native macOS sandbox is described below.
 * Check frozen executable identity, ELF or Mach-O dependencies for CLI/MCP/daemon/plugin, and Lean/Beam library paths observed in a live plugin-backed session.
-* Run direct CLI serve/update/probe/stop and MCP self-check. Verify unchanged payload hashes and absence of standalone runtime caches.
+* Run direct CLI serve/update/probe/stop and independent MCP discovery, initialization, tool listing, sync, and EOF checks for both supported protocol revisions. Verify unchanged payload hashes and absence of standalone runtime caches.
 
 The **functional** suite adds:
 
@@ -64,7 +64,7 @@ python3 run_linux.py --archive downloads/candidate/ARCHIVE.tar.zst \
 
 Add `--tier functional` for the expanded suite. Allow at least 8 GiB of free scratch space for two complete SDK copies and project compilation. If necessary, pass `--scratch-parent /a/roomy/owned/directory` outside the producer checkout being hidden. The functional suite compiles only its small consumer fixtures.
 
-`fetch.py` verifies the selected artifact's run and Lean SHA, checks the GitHub wrapper digest, and records the inner archive SHA separately. Choose an artifact ID explicitly; there is no “latest” selection. The API exposes the run's current attempt, which is recorded as an observation rather than claimed as a separately attested artifact-producing attempt. Only `tar.zst` consumption is implemented.
+`fetch.py` verifies the selected artifact's run and Lean SHA, checks the GitHub wrapper digest, and records the inner archive SHA separately. Choose an artifact ID explicitly; there is no “latest” selection. The API exposes the run's current attempt, which is recorded as an observation rather than claimed as a separately attested artifact-producing attempt. The consumer accepts publisher `tar.zst` and ZIP packages. If a GitHub artifact contains both, pass `--archive-name` to select the exact inner member; each format has its own digest and result. ZIP extraction preserves executable modes and rejects link or special-file entries. ZIP support is covered by harness fixtures; publisher ZIP packages still require native qualification.
 
 Pass `--hide-path /path/to/producer/checkout` for a local archive. Scratch must be outside that tree; use `--scratch-parent` if `/tmp` lacks space. Existing developer build directories are never renamed, modified, or removed. Temporary consumer extraction and fixtures are removed after evidence is copied out. Budget space for the downloaded wrapper, inner archive, and complete SDK extraction.
 
