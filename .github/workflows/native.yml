@@ -1,0 +1,98 @@
+# Copyright (c) 2026 Lean FRO, LLC. Released under Apache 2.0.
+name: Validate frozen native artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate:
+        description: Exact committed candidate JSON path under candidates/
+        type: string
+        required: true
+      platform:
+        description: Native consumer platform
+        type: choice
+        options: [linux-x86_64, linux-aarch64, macos-x86_64, macos-aarch64]
+      tier:
+        description: Consumer test suite
+        type: choice
+        options: [pilot, functional]
+        default: functional
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  consume:
+    if: github.repository == 'ejgallego/lean-beam-validation' && github.event_name == 'workflow_dispatch'
+    runs-on: ${{ fromJSON('{"linux-x86_64":"ubuntu-24.04","linux-aarch64":"ubuntu-24.04-arm","macos-x86_64":"macos-15-intel","macos-aarch64":"macos-15"}')[inputs.platform] }}
+    timeout-minutes: 40
+    env:
+      CANDIDATE: ${{ inputs.candidate }}
+      PLATFORM: ${{ inputs.platform }}
+      TIER: ${{ inputs.tier }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Compile and test harness
+        run: |
+          python3 -m compileall -q ./*.py tests
+          python3 -m unittest discover -s tests -v
+      - name: Check committed candidate path
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          path = Path(os.environ['CANDIDATE'])
+          if not path.is_file() or not path.resolve().is_relative_to(Path('candidates').resolve()):
+              raise SystemExit('candidate must be a committed record under candidates/')
+          PY
+          git ls-files --error-unmatch -- "$CANDIDATE"
+      - name: Install Linux consumer tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes bubblewrap zstd elan
+          if [[ -f /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          bwrap --ro-bind / / --unshare-net /usr/bin/true
+      - name: Install macOS consumer tools
+        if: runner.os == 'macOS'
+        run: brew install zstd elan
+      - name: Record harness and candidate
+        shell: bash
+        run: |
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/harness-revision.txt
+          cp "$CANDIDATE" evidence/candidate.json
+      - name: Read existing producer artifact
+        env:
+          GH_TOKEN: ${{ secrets.ARTIFACT_READ_TOKEN || github.token }}
+        run: |
+          python3 candidate.py fetch --candidate "$CANDIDATE" --platform "$PLATFORM" --download downloads/candidate
+      - name: Run native artifact consumer
+        run: |
+          python3 candidate.py validate --candidate "$CANDIDATE" --platform "$PLATFORM" \
+            --download downloads/candidate --output evidence --tier "$TIER"
+      - name: Retain download identity
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p evidence
+          if [[ -f downloads/candidate/identity.json ]]; then
+            cp downloads/candidate/identity.json evidence/artifact-identity.json
+          fi
+      - name: Upload this repository's evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.platform }}-${{ inputs.tier }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 30

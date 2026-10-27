@@ -7,13 +7,23 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import platform
 import shutil
 import subprocess
 import sys
 import tempfile
 
 from fetch import unpack
-from validate import sha256, write_json
+from validate import require, sha256, verify_inventory, write_json
+
+
+def verify_native_elf(path, architecture):
+    with Path(path).open("rb") as stream:
+        header = stream.read(20)
+    require(len(header) == 20 and header[:7] == b"\x7fELF\x02\x01\x01",
+            f"expected a 64-bit little-endian ELF: {path}")
+    require(int.from_bytes(header[18:20], "little") == {"x86_64": 62, "aarch64": 183}[architecture],
+            f"wrong native ELF architecture: {path}, expected {architecture}")
 
 
 def main():
@@ -24,11 +34,15 @@ def main():
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--producer-manifest-sha256")
     parser.add_argument("--build-id")
+    parser.add_argument("--expected-architecture", choices=["x86_64", "aarch64"], default=platform.machine())
     parser.add_argument("--hide-path", action="append", type=Path, default=[])
     parser.add_argument("--scratch-parent", type=Path)
     parser.add_argument("--tier", choices=["pilot", "functional"], default="pilot")
     parser.add_argument("--elan", type=Path, help="real elan used only to prepare offline selector links")
     args = parser.parse_args()
+    if (sys.platform != "linux" or args.expected_architecture not in {"x86_64", "aarch64"}
+            or platform.machine() != args.expected_architecture):
+        raise SystemExit("BLOCKED: the selected native Linux architecture is required")
     args.output.mkdir(parents=True, exist_ok=True)
     harness = Path(__file__).resolve().parent
     harness_snapshot = {p.name: p.read_bytes() for p in harness.glob("*.py")}
@@ -38,6 +52,7 @@ def main():
         "archive": args.archive.name, "archive_sha256": sha256(args.archive),
         "lean_sha": args.lean_sha, "beam_sha": args.beam_sha,
         "producer_manifest_sha256": args.producer_manifest_sha256,
+        "expected_architecture": args.expected_architecture,
         "harness_revision": revision, "harness_worktree_dirty": dirty,
         "harness_files": {name: hashlib.sha256(data).hexdigest() for name, data in harness_snapshot.items()},
     })
@@ -54,6 +69,13 @@ def main():
         for name, data in harness_snapshot.items():
             (scratch / name).write_bytes(data)
         sdk = unpack(args.archive, scratch / "SDK extraction with spaces λ")
+        record = verify_inventory(sdk, args.lean_sha, args.beam_sha,
+                                  manifest_sha256=args.producer_manifest_sha256, build_id=args.build_id)["record"]
+        target = record["components"]["targets"][0]
+        frontends = record["components"]["frontends"]
+        for relative in [frontends["cli"], frontends["mcp"],
+                         target["lean"], target["daemon"], target["plugin"]]:
+            verify_native_elf(sdk / relative, args.expected_architecture)
         evidence = scratch / "evidence"
         evidence.mkdir()
         for name in ["home", "tmp", "elan-home"]:

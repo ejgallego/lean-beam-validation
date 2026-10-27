@@ -72,6 +72,17 @@ For a candidate with independent producer evidence, also pass `--producer-manife
 
 ## Run in this repository
 
+The **Validate frozen native artifact** workflow consumes one committed candidate record on an explicitly selected Linux x86_64, Linux aarch64, macOS Intel, or macOS ARM runner. It defaults to the functional suite and checks the candidate's platform before selecting its consumer. Linux also checks the runner architecture and the ELF architecture of Lean, all three Beam executables, and the plugin before execution. This workflow is manual only and does not create upstream builds.
+
+Freeze a record under `candidates/` with `producer_repository`, `producer_run`, `artifact_id`, full `lean_sha` and `beam_sha`, and `platform`. Include the exact `inner_archive_filename`, `inner_archive_sha256`, and `wrapper_sha256` when the archive has been selected; include independently obtained `producer_manifest_sha256` and `build_id` when available. Download observations alone do not establish independent producer evidence. Each archive format needs its own record and result. PR, merge-queue, and published packages remain separate candidates unless their actual bytes and identities match.
+
+The same entry point works locally:
+
+```sh
+python3 candidate.py fetch --candidate candidates/FROZEN.json --platform linux-x86_64 --download downloads/candidate
+python3 candidate.py validate --candidate candidates/FROZEN.json --platform linux-x86_64 --download downloads/candidate --output evidence/candidate --tier functional
+```
+
 The **Validate artifact** workflow offers `self-test`, `linux-pilot`, and `linux-functional`. It must be dispatched explicitly on this repository. Supply producer repository, run ID, artifact ID, and exact Lean/Beam SHAs. Optional inputs accept the producer provenance digest and build ID.
 
 The default workflow token successfully reads the current public upstream artifact. If a future source requires another credential, `ARTIFACT_READ_TOKEN` can supply artifact read access. Credentials are used only in the download step. Runtime checks use a cleared environment and receive no token. If access is unavailable or the artifact has expired, download fails; the workflow never triggers a replacement upstream build.
