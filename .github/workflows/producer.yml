@@ -1,0 +1,136 @@
+# Copyright (c) 2026 Lean FRO, LLC. Released under Apache 2.0.
+name: Validate existing producer run
+
+on:
+  workflow_dispatch:
+    inputs:
+      producer_repository:
+        description: Read existing artifacts from this repository
+        type: choice
+        options: [leanprover/lean4, ejgallego/lean4]
+      producer_run:
+        description: Exact existing producer run ID
+        type: string
+        required: true
+      lean_sha:
+        description: Full expected Lean source revision
+        type: string
+        required: true
+      beam_sha:
+        description: Full expected Beam source revision
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  freeze:
+    if: github.repository == 'ejgallego/lean-beam-validation' && github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 190
+    outputs:
+      candidates: ${{ steps.freeze.outputs.candidates }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Compile and test harness
+        run: |
+          python3 -m compileall -q ./*.py tests
+          python3 -m unittest discover -s tests -v
+      - name: Wait for selected producer and freeze existing artifacts
+        id: freeze
+        env:
+          GH_TOKEN: ${{ secrets.ARTIFACT_READ_TOKEN || github.token }}
+          PRODUCER_REPOSITORY: ${{ inputs.producer_repository }}
+          PRODUCER_RUN: ${{ inputs.producer_run }}
+          LEAN_SHA: ${{ inputs.lean_sha }}
+          BEAM_SHA: ${{ inputs.beam_sha }}
+        run: |
+          python3 producer.py --repository "$PRODUCER_REPOSITORY" --run "$PRODUCER_RUN" \
+            --lean-sha "$LEAN_SHA" --beam-sha "$BEAM_SHA" --output evidence/candidates.json
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          data = json.loads(Path('evidence/candidates.json').read_text())
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
+              stream.write('candidates=' + json.dumps(data, separators=(',', ':')) + '\n')
+          PY
+      - name: Retain producer selection
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: producer-selection-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 30
+
+  consume:
+    needs: freeze
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.freeze.outputs.candidates) }}
+    runs-on: ${{ matrix.runner }}
+    name: ${{ matrix.platform }} / functional
+    timeout-minutes: 40
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      CANDIDATE_JSON: ${{ toJSON(matrix.candidate) }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Record frozen candidate and harness
+        shell: bash
+        run: |
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/harness-revision.txt
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          Path('evidence/candidate.json').write_text(json.dumps(json.loads(os.environ['CANDIDATE_JSON']), indent=2) + '\n')
+          PY
+      - name: Install Linux consumer tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes bubblewrap zstd elan
+          if [[ -f /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          bwrap --ro-bind / / --unshare-net /usr/bin/true
+      - name: Install macOS consumer tools
+        if: runner.os == 'macOS'
+        run: brew install zstd elan
+      - name: Read frozen producer artifact
+        env:
+          GH_TOKEN: ${{ secrets.ARTIFACT_READ_TOKEN || github.token }}
+        run: |
+          python3 candidate.py fetch --candidate evidence/candidate.json --platform "$PLATFORM" --download downloads/candidate
+      - name: Run native functional consumer
+        run: |
+          python3 candidate.py validate --candidate evidence/candidate.json --platform "$PLATFORM" \
+            --download downloads/candidate --output evidence --tier functional
+      - name: Retain archive identity
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f downloads/candidate/identity.json ]]; then
+            cp downloads/candidate/identity.json evidence/artifact-identity.json
+          fi
+      - name: Upload this repository's evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.platform }}-functional-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 30
