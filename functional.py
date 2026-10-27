@@ -81,15 +81,39 @@ def wait_until(predicate, message, timeout=30):
         time.sleep(0.05)
 
 
+def response_file(response, field, root):
+    value = response.get("result", {}).get(field)
+    require(response.get("ok") is True and isinstance(value, str), f"missing successful {field}: {response}")
+    path = Path(value).resolve()
+    require(path.is_relative_to(root.resolve()) and path.is_file(), f"missing or external {field}: {path}")
+    return path
+
+
+def helper_pids(root):
+    result = []
+    for name in ["helper.pid", "descendant.pid"]:
+        try:
+            text = (root / name).read_text()
+        except FileNotFoundError:
+            return None
+        if not text.isdecimal() or int(text) <= 0:
+            return None
+        result.append(int(text))
+    return result
+
+
 def helper_fixture(root, *, abrupt=False):
     simple_fixture(root)
     (root / "lakefile.toml").unlink()
     descendant = root / "descendant.py"
     descendant.write_text("from pathlib import Path\nimport os,time\n" +
-        f"Path({str(root / 'descendant.pid')!r}).write_text(str(os.getpid()))\n" +
+        f"pid_path = Path({str(root / 'descendant.pid')!r})\n" +
+        "pending_pid = pid_path.with_suffix('.pid.tmp')\n" +
+        "pending_pid.write_text(str(os.getpid()))\npending_pid.replace(pid_path)\n" +
         f"while not Path({str(root / 'release')!r}).exists(): time.sleep(0.01)\n")
     (root / "lakefile.lean").write_text("import Lake\n/-! Deterministic owned-helper lifecycle fixture. -/\nopen Lake DSL\nrun_cmd do\n" +
-        f"  IO.FS.writeFile {json.dumps(str(root / 'helper.pid'), ensure_ascii=False)} (toString (← IO.Process.getPID))\n" +
+        f"  IO.FS.writeFile {json.dumps(str(root / 'helper.pid.tmp'), ensure_ascii=False)} (toString (← IO.Process.getPID))\n" +
+        f"  IO.FS.rename {json.dumps(str(root / 'helper.pid.tmp'), ensure_ascii=False)} {json.dumps(str(root / 'helper.pid'), ensure_ascii=False)}\n" +
         "  discard <| IO.Process.spawn {\n" +
         f"    cmd := {json.dumps(sys.executable, ensure_ascii=False)}\n" +
         f"    args := #[{json.dumps(str(descendant), ensure_ascii=False)}]\n" +
@@ -206,7 +230,7 @@ class FunctionalSuite(Pilot):
             source.write_text(SOURCE.replace("dependencyValue + 1", "dependencyValue + 2"))
             self.call(root, "sync", "Demo.lean")
             saved = json.loads(self.call(root, "save", "Demo.lean").stdout)
-            require(saved["ok"] and Path(saved["result"]["irSig"]).is_file(), f"save failed: {saved}")
+            response_file(saved, "ir_sig", root)
         replay = self.capture([self.prefix / "bin/lake", "--no-cache", "-v", "build", "Demo"], cwd=root, timeout=300)
         require(replay.returncode == 0 and "Replayed Demo" in replay.stdout + replay.stderr
                 and "Built Demo" not in replay.stdout + replay.stderr, "Lake did not replay saved output")
@@ -290,7 +314,7 @@ class FunctionalSuite(Pilot):
                  ("beam-foreign", "beam-matching", False, "not a member of this Beam installation"),
                  ("beam-not-installed", None, False, "unavailable locally"),
                  ("leanprover/lean4:nightly", None, False, "requires remote resolution"),
-                 ("beam-dangling", None, False, "unavailable locally"),
+                 ("beam-dangling", None, False, "toolchains/beam-dangling/bin/lean"),
                  ("", None, False, "unavailable locally"),
                  ("malformed:selector:extra", None, False, "unavailable locally")]
         outcomes = []
@@ -305,6 +329,10 @@ class FunctionalSuite(Pilot):
             result = self.call(root, "doctor", ok=ok, env=env)
             combined = result.stdout + result.stderr
             require(not needle or needle in combined, f"wrong selector failure for {selected}: {combined}")
+            if selected == "beam-dangling":
+                error = json.loads(result.stdout)["error"]
+                require(error["code"] == "setupError" and "no such file or directory" in error["message"],
+                        f"dangling selector did not report the missing local compiler: {error}")
             outcomes.append({"selected": selected, "inherited": inherited, "returncode": result.returncode, "output": combined})
         write_json(self.output / "selector-outcomes.json", outcomes)
         require(not (Path(os.environ["HOME"]) / "elan-invocations").exists(), "runtime invoked elan")
@@ -470,7 +498,7 @@ class FunctionalSuite(Pilot):
             require(registry.exists(), "wrong-generation recovery removed the fence")
             recovered = json.loads(self.call(root, "recover", "--generation", generation).stdout)
             require(recovered["result"]["state"] == "absent" and recovered["result"]["changed"], "explicit recovery failed")
-            require(Path(recovered["result"]["quarantinedPath"]).is_file(), "recovery discarded the stale descriptor")
+            response_file(recovered, "quarantined_path", root)
             with self.owner(root):
                 self.call(root, "sync", "Main.lean")
             client.tool("lean_sync", control, {"path": "Main.lean"})
@@ -479,7 +507,7 @@ class FunctionalSuite(Pilot):
     def helper_lifetimes(self):
         outcomes = []
         for modern in [False, True]:
-            for scenario in ["eof", "cancel-drop", "client-loss", "deadline", "helper-exit"]:
+            for scenario in ["eof", "cancel-drop", "client-loss", "slow-success", "helper-exit"]:
                 root = helper_fixture(Path.cwd() / f"helper {modern} {scenario}", abrupt=scenario == "helper-exit")
                 client = McpClient([self.mcp], root, self.output / f"helper-{modern}-{scenario}",
                                    modern=modern, shutdown_timeout=30)
@@ -488,17 +516,33 @@ class FunctionalSuite(Pilot):
                     client.initialize()
                     request = client.send("tools/call", {"name": "lean_sync", "arguments": {
                         "workspace": {"root": str(root)}, "path": "Main.lean"}})
-                    wait_until(lambda: (root / "helper.pid").exists() and (root / "descendant.pid").exists(),
+                    wait_until(lambda: helper_pids(root) is not None,
                                "helper fixture did not enter", timeout=60)
-                    pids = [int((root / name).read_text()) for name in ["helper.pid", "descendant.pid"]]
+                    pids = helper_pids(root)
                     if scenario == "cancel-drop":
                         client.notify("notifications/cancelled", {"requestId": request})
                         dropped = client.tool("lean_drop_workspace", root)
                         require(dropped["dropped"], "cancelled workspace did not drop")
-                    elif scenario in {"deadline", "helper-exit"}:
+                    elif scenario == "slow-success":
+                        # Cold Lake setup has no implicit startup deadline.
+                        try:
+                            response = client.receive(request, timeout=35)
+                        except TimeoutError:
+                            pass
+                        else:
+                            raise ValidationError(f"held helper completed before release: {response}")
+                        require(client.proc.poll() is None and all(running(pid) for pid in pids),
+                                "slow setup lost an owned helper before release")
+                        (root / "release").touch()
+                        response = client.receive(request)
+                        result = response.get("result", {})
+                        require("error" not in response and result.get("isError") is False
+                                and result.get("structuredContent", {}).get("path") == "Main.lean",
+                                f"released helper did not complete sync: {response}")
+                    elif scenario == "helper-exit":
                         response = client.receive(request)
                         text = json.dumps(response)
-                        expected = "timed out" if scenario == "deadline" else "exited before completing its response"
+                        expected = "exited before completing its response"
                         require(expected in text and ("error" in response or response.get("result", {}).get("isError") is True),
                                 f"wrong helper failure: {response}")
                     elif scenario == "client-loss":
