@@ -1,0 +1,153 @@
+{
+  "copyright": "Copyright (c) 2026 Lean FRO, LLC. Apache-2.0.",
+  "validation_run": "https://github.com/ejgallego/lean-beam-validation/actions/runs/40465126492",
+  "evidence_artifact_id": 12716067652,
+  "evidence_artifact_sha256": "7d2cee2b00dadab863f0a763860152757ea31bef2e4fcd3428f6481edc78091f",
+  "harness_revision": "a4af9c0ae8399a95d2d427e8f7b2eda1e413fa69",
+  "harness_worktree_dirty": false,
+  "producer_repository": "leanprover/lean4",
+  "producer_run": 40438026492,
+  "producer_artifact_id": 12705262622,
+  "archive": "lean-4.37.0-pre-darwin_aarch64.tar.zst",
+  "archive_sha256": "0a3cc8ff2dc605d4cd81609b91d3c4c6b51bd197c841ea3cd9566598cb06c2dc",
+  "wrapper_sha256": "2a6bf86a4b34a2f8b0a6471aa3d1bd34c4f2099596c1911f90edc81e59ac4d21",
+  "platform": "macos-aarch64",
+  "observed_build_id": "25a3daeb65dad133bf3cd118b4d7f338",
+  "consumer_manifest_sha256": "b7e81f9fee2482a61f57b4f05f927a2285617b7cec0856240e1f710bd578cc3c",
+  "producer_manifest_sha256": null,
+  "harness_tests_passed": 43,
+  "harness_tests_skipped": 1,
+  "helper_lifecycle_scenarios_passed": 10,
+  "payload_sizes_bytes": {
+    "bin/lean-beam": 2118912,
+    "bin/beam-daemon": 3419824,
+    "bin/lean-beam-mcp": 5120768,
+    "lib/lean-beam/libbeam_Beam_LSP.dylib": 1094560,
+    "lib/lean-beam/LICENSE": 9159,
+    "lib/lean-beam/provenance.json": 2099
+  },
+  "suite": "macos-functional",
+  "status": "PASS",
+  "release_qualified": false,
+  "qualification_status": "PR SDK functional acceptance PASS; published package qualification pending",
+  "lean_sha": "5bc9f25e71db64c6cc27530b347c0ce8eb0d2362",
+  "beam_sha": "a9645d2033815fea9a91ce67f7e5f5c8b9eacc85",
+  "pending": [
+    "Independent producer manifest attestation",
+    "Published nightly/release archives and format reconciliation"
+  ],
+  "results": [
+    {
+      "case": "inventory",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:08:33.722536+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.19590983299997333
+    },
+    {
+      "case": "identity",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:08:33.918857+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.47545074999999315
+    },
+    {
+      "case": "Mach-O dependencies",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:08:34.394766+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 2.650018416000023
+    },
+    {
+      "case": "CLI and live plugin",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:08:37.046545+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 12.83421850000002
+    },
+    {
+      "case": "external MCP probe",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:08:49.892826+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 2.519415249999952
+    },
+    {
+      "case": "P04/P05 CLI edits and recovery",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:08:52.413832+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 30.176986209000006
+    },
+    {
+      "case": "P06 save and replay",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:09:22.606225+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 13.640183540999999
+    },
+    {
+      "case": "P07 deferred save",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:09:36.253846+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 8.128067499999986
+    },
+    {
+      "case": "P08 independent MCP",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:09:44.386353+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 2.6876950409999836
+    },
+    {
+      "case": "P09 workspace isolation",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:09:47.075797+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 4.383934000000011
+    },
+    {
+      "case": "P10/P11 offline target selectors",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:09:51.462312+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.9340204999999742
+    },
+    {
+      "case": "P12 damaged payload",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:09:52.396978+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.23324050000002217
+    },
+    {
+      "case": "P13 generation and cleanup",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:09:52.635733+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 7.03301533299998
+    },
+    {
+      "case": "P14 owned sessions",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:09:59.672610+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 21.60423637499997
+    },
+    {
+      "case": "P15 helper lifetimes",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:10:21.288644+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 91.41159729100002
+    },
+    {
+      "case": "unchanged payload",
+      "status": "PASS",
+      "started_at": "2026-10-27T07:11:52.746407+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.02589100000000144
+    }
+  ]
+}
