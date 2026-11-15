@@ -326,7 +326,8 @@ class FunctionalSuite(Pilot):
             env = dict(os.environ)
             if inherited:
                 env["ELAN_TOOLCHAIN"] = inherited
-            result = self.call(root, "doctor", ok=ok, env=env)
+            options = ["--json"] if selected == "beam-dangling" else []
+            result = self.call(root, "doctor", *options, ok=ok, env=env)
             combined = result.stdout + result.stderr
             require(not needle or needle in combined, f"wrong selector failure for {selected}: {combined}")
             if selected == "beam-dangling":
