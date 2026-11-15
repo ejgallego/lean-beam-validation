@@ -93,6 +93,8 @@ The workflow checks its own repository identity, uses read permissions, and uplo
 
 ## Evidence and next work
 
+The Lean [PR #16473](https://github.com/leanprover/lean4/pull/16473) SDKs at Lean `df802ac722` and frozen Beam `dcc11186` pass all 16 functional groups and ten helper lifecycle scenarios on Linux x86_64, Linux ARM, macOS Intel, and macOS ARM. The [consolidated report](reports/lean16473-dcc.json) records the exact producer jobs, artifact and archive hashes, consumer revisions, build identities, and six payload file sizes per platform. All four selected native producer jobs succeeded; the upstream CI run has a separate Windows Lake `leantar` access-denied failure, with Windows Beam bundling disabled. These are exact PR archive results; independent producer attestation, additional format/OS baselines, and published-package reconciliation remain separate.
+
 `downloads/candidate/identity.json` records the immutable artifact and archive identity. `evidence/` holds input identity, inventory, isolation settings, command transcripts, live module paths, owner cleanup, and a pilot summary. The workflow copies download identity into the uploaded evidence.
 
 The initial hosted Linux pilot passed in [run 39271577415](https://github.com/ejgallego/lean-beam-validation/actions/runs/39271577415). The exact candidate is recorded in [candidates/c632-linux-x86_64.json](candidates/c632-linux-x86_64.json). That pilot is separate from the expanded functional suite and full release qualification.

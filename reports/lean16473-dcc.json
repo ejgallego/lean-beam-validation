@@ -1,0 +1,680 @@
+{
+  "at": "2026-11-15T22:49:42.050921+00:00",
+  "scope": "Exact PR SDK tar.zst functional validation; not final published release qualification",
+  "lean_pr": "https://github.com/leanprover/lean4/pull/16473",
+  "lean_sha": "df802ac722a8e2628b48b721f2988bbbb7d8879d",
+  "beam_sha": "dcc11186fa637028493e709f0710c1f40a84b732",
+  "pin_held_unchanged": true,
+  "producer_run": 43758488156,
+  "producer_attempt": 1,
+  "producer_overall_ci": "FAIL: separate Windows Lake ltar test panics with PermissionDenied code5; no Beam build on Windows",
+  "native_producer_admission": "All four selected native producer jobs completed successfully; macOSIntel Tier2 skips producer Lean tests, independent functional consumer passes",
+  "functional_status": "PASS",
+  "release_qualified": false,
+  "pending_release_evidence": [
+    "Independent producer manifest attestation",
+    "Archive format and minimum OS baseline matrix",
+    "Actual published package byte reconciliation"
+  ],
+  "windows_beam_bundling": "disabled; outside this native Linux/macOS gate",
+  "same_consumer_python_sources_all_platforms": {
+    "fetch.py": "2bb5d5538aa084ba5eeeb8b918e11507ac8b1dd8ddf4127246e85aa10f6ef0ac",
+    "sandbox_probe.py": "e0c11e3122c67ff69e29b4e5472241fce77f142f668628f15c17e38b78e2f4c0",
+    "validate.py": "4d619fbc9ccdd2a47e85286db5557dca7208a69e62ea0acea7438a944da6d65e",
+    "macos.py": "c0a2b2ac9614f830cd8d8735ecad71d15bc321c4d9ae6bd558b017999cb49b53",
+    "run_macos.py": "597eebe5df9a268b07e4eca68c3f0c731ecc2ef1c5f1879812c4a0fb42cc982a",
+    "run_linux.py": "e20e3ae5b8c1c2c8347b76c159e6cd904006785754dc7df144fd43986a8fc198",
+    "candidate.py": "6e59f9d01dc238e173055af8a7e916f29b534c0588a4962b54dbf1ba6cdc2b23",
+    "processes.py": "efb216b31367830d6558aa3f1dcb06fc94177ce3df0c5fa602291715b62836a2",
+    "functional.py": "9c949d225a57a791e51b5667101f7f2d1b34fe6b399da22cebb3675cfcbdae4a",
+    "mcp_client.py": "08ec949b58f99a96ac7acf5b1e5005d8f7fca7bdf43423ede995bc8392e471c0",
+    "producer.py": "abb9eee231628d3fc3a1485ffc8144e49e8504301a427a7b1ff27c73d95e53b3"
+  },
+  "platforms": {
+    "linux-x86_64": {
+      "status": "PASS",
+      "functional_groups": 16,
+      "helper_lifecycle_scenarios": 10,
+      "validation_run": 43769528941,
+      "validation_url": "https://github.com/ejgallego/lean-beam-validation/actions/runs/43769528941",
+      "harness_revision": "4a8219e947f1e7840ed5b7cff15c3fabc2d3c284",
+      "producer_job": 132947774394,
+      "producer_attempt": 1,
+      "artifact_id": 14179464406,
+      "wrapper_sha256": "46af847c8ed4dbcd78dbc138261c3a72ed67daed31242ee776be0daf8d324c55",
+      "inner_archive_filename": "lean-4.37.0-pre-linux.tar.zst",
+      "inner_archive_sha256": "2daffb4bfc6bb8aa4968159311301031ac3081c55860fb3b98db52e5c5e5efd4",
+      "build_id": "f083891561863d9bae180bc162c30260",
+      "consumer_observed_manifest_sha256": "11023fdb557004d2bb8316c2b4eecdac248ad0d341388191c213d160333382b3",
+      "independent_producer_manifest_digest_supplied": false,
+      "files": {
+        "bin/lean-beam": {
+          "sha256": "cb7b8ed0d984d20ce14a22b5909300b5121eb5d207e1eec64452453aa505a783",
+          "size": 2440120
+        },
+        "bin/beam-daemon": {
+          "sha256": "6e0bf81a768d4e8021ea5cbc4e0dcb16862912c6a3d13ec767c3c823564044bc",
+          "size": 4629784
+        },
+        "bin/lean-beam-mcp": {
+          "sha256": "ac37cbaa7b0af7cab6fae1312452b1ae63881233bed21f20477cb078a27758ec",
+          "size": 6800216
+        },
+        "lib/lean-beam/libbeam_Beam_LSP.so": {
+          "sha256": "ded47b0eae52c8553716c4e330551581ad0df469042a1a05776ffcfdfa70e7f7",
+          "size": 1630272
+        },
+        "lib/lean-beam/LICENSE": {
+          "sha256": "7ef159fd8db5a7a9e8051aac48997353f26d744e25f730a0594a806c126d2114",
+          "size": 9159
+        },
+        "lib/lean-beam/provenance.json": {
+          "sha256": "11023fdb557004d2bb8316c2b4eecdac248ad0d341388191c213d160333382b3",
+          "size": 2090
+        }
+      },
+      "uncompressed_payload_bytes": 15511641,
+      "checks": [
+        {
+          "case": "inventory",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:44.973591+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.10396242000001621
+        },
+        {
+          "case": "identity",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:45.077723+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.2573556250000024
+        },
+        {
+          "case": "ELF dependencies",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:45.339383+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.06880660600000965
+        },
+        {
+          "case": "CLI and live plugin",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:45.409576+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 1.2019479020000006
+        },
+        {
+          "case": "external MCP probe",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:46.612624+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 1.161242699000013
+        },
+        {
+          "case": "P04/P05 CLI edits and recovery",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:47.778256+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 7.660177922999992
+        },
+        {
+          "case": "P06 save and replay",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:55.438648+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 4.33265988399998
+        },
+        {
+          "case": "P07 deferred save",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:59.771563+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 3.265698606000001
+        },
+        {
+          "case": "P08 independent MCP",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:03.037528+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 1.5487671850000027
+        },
+        {
+          "case": "P09 workspace isolation",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:04.586587+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 2.2767253589999825
+        },
+        {
+          "case": "P10/P11 offline target selectors",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:06.863582+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.4491161100000056
+        },
+        {
+          "case": "P12 damaged payload",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:07.312860+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.17755088499998806
+        },
+        {
+          "case": "P13 generation and cleanup",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:07.490628+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 2.1938396330000103
+        },
+        {
+          "case": "P14 owned sessions",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:09.684687+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 8.662809753999994
+        },
+        {
+          "case": "P15 helper lifetimes",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:18.347703+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 74.89640087199999
+        },
+        {
+          "case": "unchanged payload",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:32:33.244239+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.011694194999961383
+        }
+      ]
+    },
+    "linux-aarch64": {
+      "status": "PASS",
+      "functional_groups": 16,
+      "helper_lifecycle_scenarios": 10,
+      "validation_run": 43769537027,
+      "validation_url": "https://github.com/ejgallego/lean-beam-validation/actions/runs/43769537027",
+      "harness_revision": "4a8219e947f1e7840ed5b7cff15c3fabc2d3c284",
+      "producer_job": 132947774401,
+      "producer_attempt": 1,
+      "artifact_id": 14180203863,
+      "wrapper_sha256": "e968454f1d9e5f6cae31cf83301d1926b6069c85d6effadc3780e9eed176b012",
+      "inner_archive_filename": "lean-4.37.0-pre-linux_aarch64.tar.zst",
+      "inner_archive_sha256": "ca81df879ed07d09455442b39b9c2fb0fd5e213fa74ccc4382284e5f11db5130",
+      "build_id": "3cf6c9294f2b127b0596a0fb02c1885c",
+      "consumer_observed_manifest_sha256": "81fa9a7de5acb6ea159b1eb227dd45700340ead2d1ea0c73c70fa3353307601b",
+      "independent_producer_manifest_digest_supplied": false,
+      "files": {
+        "bin/lean-beam": {
+          "sha256": "5c09485f49dbbd73051e92363ca1145a05a9c9948a8f94a6e8f670cba385be78",
+          "size": 2757488
+        },
+        "bin/beam-daemon": {
+          "sha256": "596547e5411166b0fda8bbbac0045961ed5ffc719503ba0890c75282745f9a02",
+          "size": 5197664
+        },
+        "bin/lean-beam-mcp": {
+          "sha256": "64e211ea029432c13dd5f5d04bb17c9e2986187acd94fa9bbb3f9aa06aa1eb87",
+          "size": 7662568
+        },
+        "lib/lean-beam/libbeam_Beam_LSP.so": {
+          "sha256": "4a857927bb7b0b2ef3b8a959047a04b7d5e9d157cabee7cbc7cba9e71939ead0",
+          "size": 1816608
+        },
+        "lib/lean-beam/LICENSE": {
+          "sha256": "7ef159fd8db5a7a9e8051aac48997353f26d744e25f730a0594a806c126d2114",
+          "size": 9159
+        },
+        "lib/lean-beam/provenance.json": {
+          "sha256": "81fa9a7de5acb6ea159b1eb227dd45700340ead2d1ea0c73c70fa3353307601b",
+          "size": 2092
+        }
+      },
+      "uncompressed_payload_bytes": 17445579,
+      "checks": [
+        {
+          "case": "inventory",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:09.782352+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.1294541769999995
+        },
+        {
+          "case": "identity",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:09.912069+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.257607084
+        },
+        {
+          "case": "ELF dependencies",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:10.211201+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.1632721590000017
+        },
+        {
+          "case": "CLI and live plugin",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:10.381905+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 1.2100921920000047
+        },
+        {
+          "case": "external MCP probe",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:11.642097+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 1.2115835609999976
+        },
+        {
+          "case": "P04/P05 CLI edits and recovery",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:12.880508+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 8.493714014999995
+        },
+        {
+          "case": "P06 save and replay",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:21.374641+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 4.628293943999992
+        },
+        {
+          "case": "P07 deferred save",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:26.003422+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 3.4556294669999943
+        },
+        {
+          "case": "P08 independent MCP",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:29.459521+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 1.6248646869999988
+        },
+        {
+          "case": "P09 workspace isolation",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:31.084862+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 2.3719862919999883
+        },
+        {
+          "case": "P10/P11 offline target selectors",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:33.457380+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.560583395000009
+        },
+        {
+          "case": "P12 damaged payload",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:34.018350+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.2650194850000105
+        },
+        {
+          "case": "P13 generation and cleanup",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:34.283765+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 2.2874491140000117
+        },
+        {
+          "case": "P14 owned sessions",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:36.571606+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 8.511546838000001
+        },
+        {
+          "case": "P15 helper lifetimes",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:45.083539+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 76.14975807099998
+        },
+        {
+          "case": "unchanged payload",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:32:01.233653+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.011253664999998136
+        }
+      ]
+    },
+    "macos-aarch64": {
+      "status": "PASS",
+      "functional_groups": 16,
+      "helper_lifecycle_scenarios": 10,
+      "validation_run": 43769557032,
+      "validation_url": "https://github.com/ejgallego/lean-beam-validation/actions/runs/43769557032",
+      "harness_revision": "4a8219e947f1e7840ed5b7cff15c3fabc2d3c284",
+      "producer_job": 132947774550,
+      "producer_attempt": 1,
+      "artifact_id": 14179469881,
+      "wrapper_sha256": "ff0e58cc3922dd8007fa3fd9f77b486868db1e513a71934a1274c64ed89b1811",
+      "inner_archive_filename": "lean-4.37.0-pre-darwin_aarch64.tar.zst",
+      "inner_archive_sha256": "5df46947425eee7a97f32abf7fba0440f9d1e7e1c0ab8b096efbd81ab70d71b6",
+      "build_id": "164140965426558e7725ef3e1c9ea58e",
+      "consumer_observed_manifest_sha256": "5c94f377eb93c7ebe9c4f8527233718457cecd3eee57373cad1248ba4da06bc3",
+      "independent_producer_manifest_digest_supplied": false,
+      "files": {
+        "bin/lean-beam": {
+          "sha256": "c3996b49e057cc8e98a24a8f4c5241efdd912608a97dca67f5d1fdbf627c1a72",
+          "size": 2247520
+        },
+        "bin/beam-daemon": {
+          "sha256": "c04bffce60f4af0860c858579962b77fb96f54b5e190b99cad9f7d86fabd794a",
+          "size": 3701376
+        },
+        "bin/lean-beam-mcp": {
+          "sha256": "0f9f84223277b4616217cfe0ad3af3bcfcb1416ae165885004d49f728028a898",
+          "size": 5476480
+        },
+        "lib/lean-beam/libbeam_Beam_LSP.dylib": {
+          "sha256": "c1546c8deb56bd2848e9e01c8a33a91585a44032b70ea0e0278783b1c92c2624",
+          "size": 1271680
+        },
+        "lib/lean-beam/LICENSE": {
+          "sha256": "7ef159fd8db5a7a9e8051aac48997353f26d744e25f730a0594a806c126d2114",
+          "size": 9159
+        },
+        "lib/lean-beam/provenance.json": {
+          "sha256": "5c94f377eb93c7ebe9c4f8527233718457cecd3eee57373cad1248ba4da06bc3",
+          "size": 2099
+        }
+      },
+      "uncompressed_payload_bytes": 12708314,
+      "checks": [
+        {
+          "case": "inventory",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:29.652256+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.19154249999999706
+        },
+        {
+          "case": "identity",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:29.844235+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.40503562500001067
+        },
+        {
+          "case": "Mach-O dependencies",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:30.249669+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 2.2881696249999948
+        },
+        {
+          "case": "CLI and live plugin",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:32.539163+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 10.426083500000004
+        },
+        {
+          "case": "external MCP probe",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:42.971535+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 1.9126287919999925
+        },
+        {
+          "case": "P04/P05 CLI edits and recovery",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:30:44.885683+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 23.514337833000013
+        },
+        {
+          "case": "P06 save and replay",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:08.412891+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 10.095636124999999
+        },
+        {
+          "case": "P07 deferred save",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:18.514141+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 6.084759375000004
+        },
+        {
+          "case": "P08 independent MCP",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:24.602305+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 2.419763208000006
+        },
+        {
+          "case": "P09 workspace isolation",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:27.023684+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 3.496569875000006
+        },
+        {
+          "case": "P10/P11 offline target selectors",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:30.522822+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 1.1836218329999895
+        },
+        {
+          "case": "P12 damaged payload",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:31.707317+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.334920832999984
+        },
+        {
+          "case": "P13 generation and cleanup",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:32.048642+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 7.059944791999982
+        },
+        {
+          "case": "P14 owned sessions",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:39.112705+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 14.887632499999995
+        },
+        {
+          "case": "P15 helper lifetimes",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:31:54.008097+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 85.45532841599996
+        },
+        {
+          "case": "unchanged payload",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:33:19.506470+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.033104332999982944
+        }
+      ]
+    },
+    "macos-x86_64": {
+      "status": "PASS",
+      "functional_groups": 16,
+      "helper_lifecycle_scenarios": 10,
+      "validation_run": 43770309881,
+      "validation_url": "https://github.com/ejgallego/lean-beam-validation/actions/runs/43770309881",
+      "harness_revision": "95f89374098ec3ef6ae6c77169d10e4b8dcb1eec",
+      "producer_job": 132947774406,
+      "producer_attempt": 1,
+      "artifact_id": 14183623790,
+      "wrapper_sha256": "3a4eb25768160a7d1e2e84e1ad83c1d47c5458ddb1637f1e0aa1c557ed6b290c",
+      "inner_archive_filename": "lean-4.37.0-pre-darwin.tar.zst",
+      "inner_archive_sha256": "d13c6558adc2834b1d773b410b228fcd6e37482508f747b1890ed338d18f4bb6",
+      "build_id": "2084aea8b7b6258fe3166ffa25745f9f",
+      "consumer_observed_manifest_sha256": "e528d7bd95c57e90f1b912136ee855a0a07eb6e37b8b7b7456a66ddc5b54797b",
+      "independent_producer_manifest_digest_supplied": false,
+      "files": {
+        "bin/lean-beam": {
+          "sha256": "045b80a84ce9d81180795e7894ba680572179830439d4a277270e01b9560301c",
+          "size": 2304000
+        },
+        "bin/beam-daemon": {
+          "sha256": "1975bccfeb1bf9ce92c4889e68d196ee1bce9fe40b2eb03294faa84e3650d57a",
+          "size": 3769832
+        },
+        "bin/lean-beam-mcp": {
+          "sha256": "f5abf22f46e0e50ca5dc86ec2a13a8019a0de26158691bcd9cd3664280edb1d7",
+          "size": 5562096
+        },
+        "lib/lean-beam/libbeam_Beam_LSP.dylib": {
+          "sha256": "933043385a4beecf0891716635a93dd2d669744b260c281d09fd88fb483f32d7",
+          "size": 1297712
+        },
+        "lib/lean-beam/LICENSE": {
+          "sha256": "7ef159fd8db5a7a9e8051aac48997353f26d744e25f730a0594a806c126d2114",
+          "size": 9159
+        },
+        "lib/lean-beam/provenance.json": {
+          "sha256": "e528d7bd95c57e90f1b912136ee855a0a07eb6e37b8b7b7456a66ddc5b54797b",
+          "size": 2101
+        }
+      },
+      "uncompressed_payload_bytes": 12944900,
+      "checks": [
+        {
+          "case": "inventory",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:40:11.129543+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 1.3182682789999944
+        },
+        {
+          "case": "identity",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:40:12.449351+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.7356532990000915
+        },
+        {
+          "case": "Mach-O dependencies",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:40:13.186720+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 5.859156466000059
+        },
+        {
+          "case": "CLI and live plugin",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:40:19.049104+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 18.748276852000004
+        },
+        {
+          "case": "external MCP probe",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:40:37.807323+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 2.7663050510000176
+        },
+        {
+          "case": "P04/P05 CLI edits and recovery",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:40:40.575691+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 35.45066908199999
+        },
+        {
+          "case": "P06 save and replay",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:41:16.044574+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 16.63936481500002
+        },
+        {
+          "case": "P07 deferred save",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:41:32.693051+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 9.907736897000063
+        },
+        {
+          "case": "P08 independent MCP",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:41:42.606279+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 3.6117280299999948
+        },
+        {
+          "case": "P09 workspace isolation",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:41:46.220482+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 6.123062036999954
+        },
+        {
+          "case": "P10/P11 offline target selectors",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:41:52.347393+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 1.374489204999918
+        },
+        {
+          "case": "P12 damaged payload",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:41:53.723153+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.697194601000092
+        },
+        {
+          "case": "P13 generation and cleanup",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:41:54.421587+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 10.59161803500001
+        },
+        {
+          "case": "P14 owned sessions",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:42:05.019072+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 22.33667897700002
+        },
+        {
+          "case": "P15 helper lifetimes",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:42:27.368397+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 88.734802048
+        },
+        {
+          "case": "unchanged payload",
+          "status": "PASS",
+          "started_at": "2026-11-15T22:43:56.148046+00:00",
+          "identity_file": "input.json",
+          "duration_seconds": 0.03325337799992667
+        }
+      ]
+    }
+  },
+  "harness_repairs": [
+    "Match updated foreign selector diagnostic without changing required refusal",
+    "Canonicalize aliased temporary paths in unit fixture; Linux alias red/green evidence retained",
+    "Request doctor --json before asserting typed setupError; all12 selector controls passed before retry"
+  ],
+  "preserved_failed_runs": [
+    43768716184,
+    43768727941,
+    43768740381,
+    43769067571
+  ],
+  "official_ci_reruns_or_dispatches": 0,
+  "official_source_or_pin_updates_during_validation": 0
+}

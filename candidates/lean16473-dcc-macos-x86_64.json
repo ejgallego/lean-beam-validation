@@ -9,6 +9,12 @@
   "lean_sha": "df802ac722a8e2628b48b721f2988bbbb7d8879d",
   "beam_sha": "dcc11186fa637028493e709f0710c1f40a84b732",
   "wrapper_sha256": "3a4eb25768160a7d1e2e84e1ad83c1d47c5458ddb1637f1e0aa1c557ed6b290c",
-  "qualification_status": "PENDING",
-  "note": "Exact SDK from successful macOSIntel producer job. Tier2 producer skips Lean tests; separate functional consumer required. Overall CI failed Windows ltar test; no overallCI success claim."
+  "qualification_status": "BLOCKED",
+  "note": "Exact SDK from successful macOSIntel producer job. Tier2 producer skips Lean tests; separate functional consumer required. Overall CI failed Windows ltar test; no overallCI success claim.",
+  "hosted_functional": {
+    "status": "PASS",
+    "validation_run": "https://github.com/ejgallego/lean-beam-validation/actions/runs/43770309881",
+    "harness_revision": "95f89374098ec3ef6ae6c77169d10e4b8dcb1eec",
+    "report": "../reports/lean16473-dcc.json"
+  }
 }
