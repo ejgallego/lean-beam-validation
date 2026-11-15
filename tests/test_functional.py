@@ -10,12 +10,15 @@ from validate import ValidationError
 class FixtureTests(unittest.TestCase):
     def test_current_cli_file_fields_require_real_owned_outputs(self):
         with tempfile.TemporaryDirectory() as scratch:
-            root = Path(scratch)
+            project = Path(scratch) / "project"
+            project.mkdir()
+            root = Path(scratch) / "project alias"
+            root.symlink_to(project, target_is_directory=True)
             output = root / "produced file"
             output.write_text("receipt")
             for field, obsolete in [("ir_sig", "irSig"), ("quarantined_path", "quarantinedPath")]:
                 response = {"ok": True, "result": {field: str(output)}}
-                self.assertEqual(response_file(response, field, root), output)
+                self.assertEqual(response_file(response, field, root), output.resolve())
                 for invalid in [{"ok": True, "result": {obsolete: str(output)}},
                                 {"ok": True, "result": {field: str(root / 'missing')}},
                                 {"ok": False, "result": {field: str(output)}}]:
