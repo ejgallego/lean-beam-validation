@@ -1,0 +1,14 @@
+{
+  "producer_repository": "leanprover/lean4",
+  "producer_run": 43758488156,
+  "producer_job": 132947774394,
+  "producer_attempt": 1,
+  "artifact_id": 14179464406,
+  "artifact_name": "build-Linux release",
+  "platform": "linux-x86_64",
+  "lean_sha": "df802ac722a8e2628b48b721f2988bbbb7d8879d",
+  "beam_sha": "dcc11186fa637028493e709f0710c1f40a84b732",
+  "wrapper_sha256": "46af847c8ed4dbcd78dbc138261c3a72ed67daed31242ee776be0daf8d324c55",
+  "qualification_status": "PENDING",
+  "note": "Exact PR SDK candidate from a successful native producer job. Overall CI includes a separate failed Windows ltar test; no overall-CI-success claim. Windows Beam bundling remains disabled."
+}
