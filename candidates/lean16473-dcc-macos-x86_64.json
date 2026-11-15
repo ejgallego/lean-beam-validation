@@ -1,0 +1,14 @@
+{
+  "producer_repository": "leanprover/lean4",
+  "producer_run": 43758488156,
+  "producer_job": 132947774406,
+  "producer_attempt": 1,
+  "artifact_id": 14183623790,
+  "artifact_name": "build-macOS",
+  "platform": "macos-x86_64",
+  "lean_sha": "df802ac722a8e2628b48b721f2988bbbb7d8879d",
+  "beam_sha": "dcc11186fa637028493e709f0710c1f40a84b732",
+  "wrapper_sha256": "3a4eb25768160a7d1e2e84e1ad83c1d47c5458ddb1637f1e0aa1c557ed6b290c",
+  "qualification_status": "PENDING",
+  "note": "Exact SDK from successful macOSIntel producer job. Tier2 producer skips Lean tests; separate functional consumer required. Overall CI failed Windows ltar test; no overallCI success claim."
+}
