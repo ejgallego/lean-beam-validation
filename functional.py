@@ -309,9 +309,9 @@ class FunctionalSuite(Pilot):
                  ("beam-matching", None, True, "target membership: present"),
                  ("beam-matching-second", None, True, "target membership: present"),
                  ("beam-alias", None, True, "target membership: present"),
-                 ("beam-foreign", None, False, "not a member of this Beam installation"),
+                 ("beam-foreign", None, False, "bundled Beam serves only its containing Lean installation"),
                  ("beam-matching", "beam-foreign", True, "target membership: present"),
-                 ("beam-foreign", "beam-matching", False, "not a member of this Beam installation"),
+                 ("beam-foreign", "beam-matching", False, "bundled Beam serves only its containing Lean installation"),
                  ("beam-not-installed", None, False, "unavailable locally"),
                  ("leanprover/lean4:nightly", None, False, "requires remote resolution"),
                  ("beam-dangling", None, False, "toolchains/beam-dangling/bin/lean"),
@@ -362,7 +362,7 @@ class FunctionalSuite(Pilot):
                 require("error" in foreign_handle or foreign_handle.get("result", {}).get("isError") is True,
                         f"cross-workspace handle admitted: {foreign_handle}")
                 selector = first / "lean-toolchain"
-                for selected, needle in [("beam-foreign", "not a member of this Beam installation"),
+                for selected, needle in [("beam-foreign", "bundled Beam serves only its containing Lean installation"),
                                          ("beam-not-installed", "unavailable locally")]:
                     selector.write_text(selected + "\n")
                     denied = client.tool("lean_sync", first, {"path": "Main.lean"}, allow_error=True)
