@@ -1,0 +1,169 @@
+{
+  "at": "2026-11-16T00:38:35.821416+00:00",
+  "scope": "Exact v4.36 PR Linux x86_64 tar.zst functional validation",
+  "lean_pr": "https://github.com/leanprover/lean4/pull/16478",
+  "lean_sha": "79d9ba9630bf1f81529cf151f790fec1e6468c6d",
+  "beam_sha": "10c7238efd7915bba2a7cca951c32b8485b8fa2e",
+  "harness_revision": "b2dc932e459ab8230b213c0d997a92d317753431",
+  "functional_status": "PASS",
+  "functional_groups": 16,
+  "helper_lifecycle_scenarios": 10,
+  "producer_run": 43776063608,
+  "producer_job": 133002685643,
+  "producer_attempt": 2,
+  "artifact_id": 14187471369,
+  "wrapper_sha256": "d7f24359d72e0343911272c49310e5bea07d07466d9bead075b908ea7d28f909",
+  "inner_archive_filename": "lean-4.36.0-linux.tar.zst",
+  "inner_archive_sha256": "c17581548089afa54d0dc609d38ded7e001d911c5f69301be65ab65d049e2ea2",
+  "build_id": "57ff3d7b30c4fb26f951917a76daced1",
+  "manifest_sha256": "083f77415554ba7a8b16ebb33e4f8a4481b9aae9fd687f72d69dffa6a3973e16",
+  "files": {
+    "bin/lean-beam": {
+      "sha256": "e55524e214e79de5fdcd6319a7aa7bf3f69e5acb58e947a443cb892b8f197ab4",
+      "size": 2440000
+    },
+    "bin/beam-daemon": {
+      "sha256": "4cfbc474c1149055e5096a1022ae738b344e43e0cc4972f5c7527746bd530499",
+      "size": 4628120
+    },
+    "bin/lean-beam-mcp": {
+      "sha256": "b530d00d6b3215e1128794acbff6f87592cfad6d90db87140c2e898639845a42",
+      "size": 6797656
+    },
+    "lib/lean-beam/libbeam_Beam_LSP.so": {
+      "sha256": "00933fc1c1162d4c877fe5e15f79ecd036b9079f253440a1ae49eb16a8981757",
+      "size": 1629504
+    },
+    "lib/lean-beam/LICENSE": {
+      "sha256": "7ef159fd8db5a7a9e8051aac48997353f26d744e25f730a0594a806c126d2114",
+      "size": 9159
+    },
+    "lib/lean-beam/provenance.json": {
+      "sha256": "083f77415554ba7a8b16ebb33e4f8a4481b9aae9fd687f72d69dffa6a3973e16",
+      "size": 2041
+    }
+  },
+  "checks": [
+    {
+      "case": "inventory",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:35:55.449539+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.10883844200000681
+    },
+    {
+      "case": "identity",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:35:55.558561+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.2265190260000054
+    },
+    {
+      "case": "ELF dependencies",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:35:55.786190+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.12431368500000417
+    },
+    {
+      "case": "CLI and live plugin",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:35:55.914919+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 1.1988913699999841
+    },
+    {
+      "case": "external MCP probe",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:35:57.120736+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 1.187188290999984
+    },
+    {
+      "case": "P04/P05 CLI edits and recovery",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:35:58.308705+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 7.873615561999998
+    },
+    {
+      "case": "P06 save and replay",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:36:06.182784+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 4.499823815000013
+    },
+    {
+      "case": "P07 deferred save",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:36:10.682827+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 3.3315634949999833
+    },
+    {
+      "case": "P08 independent MCP",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:36:14.014634+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 1.6074330369999927
+    },
+    {
+      "case": "P09 workspace isolation",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:36:15.622360+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 2.457311450999981
+    },
+    {
+      "case": "P10/P11 offline target selectors",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:36:18.079962+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.4459456609999961
+    },
+    {
+      "case": "P12 damaged payload",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:36:18.526061+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.17261317699998813
+    },
+    {
+      "case": "P13 generation and cleanup",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:36:18.698861+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 2.3533910010000056
+    },
+    {
+      "case": "P14 owned sessions",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:36:21.052468+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 8.49140558000002
+    },
+    {
+      "case": "P15 helper lifetimes",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:36:29.544091+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 75.73122895000003
+    },
+    {
+      "case": "unchanged payload",
+      "status": "PASS",
+      "started_at": "2026-11-16T00:37:45.275462+00:00",
+      "identity_file": "input.json",
+      "duration_seconds": 0.011770146000003479
+    }
+  ],
+  "validation_run": 43781054839,
+  "validation_url": "https://github.com/ejgallego/lean-beam-validation/actions/runs/43781054839",
+  "release_qualified": false,
+  "pending_release_evidence": [
+    "P01 independent producer attestation",
+    "P16 other platforms/formats",
+    "P17 publication reconciliation"
+  ],
+  "merge_gate": "Functional artifact gate passed; all PR CI checks still required"
+}

@@ -10,5 +10,8 @@
   "beam_sha": "10c7238efd7915bba2a7cca951c32b8485b8fa2e",
   "wrapper_sha256": "d7f24359d72e0343911272c49310e5bea07d07466d9bead075b908ea7d28f909",
   "qualification_status": "PENDING",
-  "note": "Exact v4.36 backport SDK. Build, Beam, install, package, upload and tests succeeded; remaining producer benchmarks and other PR checks must pass before merge."
+  "note": "Exact v4.36 backport archive passed 16 functional groups and 10 helper lifecycle scenarios. Full release qualification is separate; merge still requires all PR checks passing.",
+  "functional_status": "PASS",
+  "validation_run": 43781054839,
+  "inner_archive_sha256": "c17581548089afa54d0dc609d38ded7e001d911c5f69301be65ab65d049e2ea2"
 }
