@@ -1,0 +1,14 @@
+{
+  "producer_repository": "leanprover/lean4",
+  "producer_run": 43776063608,
+  "producer_job": 133002685643,
+  "producer_attempt": 2,
+  "artifact_id": 14187471369,
+  "artifact_name": "build-Linux release",
+  "platform": "linux-x86_64",
+  "lean_sha": "79d9ba9630bf1f81529cf151f790fec1e6468c6d",
+  "beam_sha": "10c7238efd7915bba2a7cca951c32b8485b8fa2e",
+  "wrapper_sha256": "d7f24359d72e0343911272c49310e5bea07d07466d9bead075b908ea7d28f909",
+  "qualification_status": "PENDING",
+  "note": "Exact v4.36 backport SDK. Build, Beam, install, package, upload and tests succeeded; remaining producer benchmarks and other PR checks must pass before merge."
+}
